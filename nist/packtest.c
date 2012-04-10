@@ -557,6 +557,7 @@ PackTestL (int *ARRAY, int ArraySize, char *C)
   for (i = 4; i < ArraySize; i = (i << 1))
     {
       int inter;
+      fprintf (stderr, "\t\t   ArraySize: %d\n", i);
       inter = MOD (ARRAY[ArraySize - i], ArraySize - i);
       if (failure >= 8)
 	{
@@ -600,6 +601,7 @@ PackTestL (int *ARRAY, int ArraySize, char *C)
   for (i = 0; i < 8; i++)
     {
       int index;
+      fprintf (stderr, "\t\t      Slice number: %d\n", i);
       index = (ArraySize / 8) * i;
       if (ArraySize > 262144)
 	index = index + (MOD (ARRAY[index], (ArraySize / 8) - 32768));
