@@ -33,7 +33,7 @@ if ENABLE_SYSTEMD
 install-exec-hook:
 	$(do_subst) < $(srcdir)/$(src_tmpl) > haveged.service;
 
-install-data-hook:
+install-data-hook: install-exec-hook
 if ENABLE_SYSTEMD_LOOKUP
 	install -p -D -m644 haveged.service $(DESTDIR)`pkg-config --variable=systemdsystemunitdir systemd`/haveged.service;
 else
