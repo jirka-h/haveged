@@ -11,11 +11,11 @@
 
 
 static int random_pool1 [_32MB];
-char basename[FILENAME_MAX+1];
+char basedirname[FILENAME_MAX+1];
 
 char *GetBaseDir(void)
 {
-  return basename;
+  return basedirname;
 }
 
 int main(int argc, char **argv)
@@ -31,10 +31,10 @@ long result=0;
  /**
   * get optional directory name
   */
- basename[0] = 0;
+ basedirname[0] = 0;
  if (argc>2) {
-  strcat(basename, argv[2]);
-  strcat(basename, "/");
+  strcat(basedirname, argv[2]);
+  strcat(basedirname, "/");
  }
 
 filename = argv[1];

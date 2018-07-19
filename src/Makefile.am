@@ -9,8 +9,9 @@ endif
 AM_CFLAGS=-Wall -I..
 
 ####nolibtool_start##
-##haveged_SOURCES = haveged.c havege.c havegetune.c havegecollect.c havegetest.c \
-##                  cpuid-43.h haveged.h havege.h havegetune.h havegecollect.h havegetest.h oneiteration.h
+##haveged_SOURCES = haveged.c havege.c havegetune.c havegecollect.c havegetest.c havegecmd.c \
+##                  cpuid-43.h haveged.h havege.h havegetune.h havegecollect.h havegetest.h oneiteration.h \
+##                  havegecmd.h
 ##
 ##haveged_LDADD = @HA_LDFLAGS@
 ####nolibtool_end##
@@ -20,10 +21,11 @@ libhavege_la_CPPFLAGS =
 libhavege_la_LDFLAGS = -version-number @HAVEGE_LT_VERSION@
 libhavege_la_LIBADD = @HA_LDFLAGS@
 
-libhavege_la_SOURCES = havege.c havegetune.c havegecollect.c havegetest.c \
-            cpuid-43.h havege.h havegetune.h havegecollect.h havegetest.h oneiteration.h
+libhavege_la_SOURCES = havege.c havegetune.c havegecollect.c havegetest.c havegecmd.c \
+            cpuid-43.h havege.h havegetune.h havegecollect.h havegetest.h oneiteration.h \
+            havegecmd.h
 
-pkginclude_HEADERS = havege.h
+pkginclude_HEADERS = havege.h havegecmd.h
 
 haveged_SOURCES = haveged.c haveged.h
 

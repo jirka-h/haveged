@@ -31,6 +31,24 @@ below for further information.
 -b nnn, --buffer=nnn
 Set collection buffer size to nnn KW. Default is 128KW (or 512KB).
 .TP
+-c cmd, --command=cmd
+Switch to command mode and send a command to an already running
+.B haveged
+process or daemon.  Currently the only knows command is
+.IR root = <new_root>
+where
+.I <new_root>
+is a place holder for the path of the real new root directory which should
+provide a haveged installation. The
+.B haveged
+process or daemon will perform a
+.BR chroot (2)
+system call followed by a
+.BR execv (3)
+to become rebased
+.B within
+the new root directory.
+.TP
 -d nnn, --data=nnn
 Set data cache size to nnn KB. Default is 16 or as determined dynamically.
 .TP

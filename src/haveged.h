@@ -45,6 +45,7 @@ struct pparams  {
    H_UINT         verbose;          /* Output level for log or stdout               */
    char           *version;         /* Our version                                  */
    char           *watermark;       /* path to write_wakeup_threshold               */
+   char           *command;         /* command which will be send/received          */
   };
 /**
  * Buffer size used when not running as daemon
@@ -64,6 +65,7 @@ struct pparams  {
 #define   RUN_IN_FG     0x020
 #define   SET_LWM       0x040
 #define   MULTI_CORE    0x080
+#define   CMD_MODE      0x100
 /**
  * Default tests settings
  */
@@ -83,5 +85,10 @@ typedef struct {
    double         etime;            /* milliseconds for last collection */
    double         estart;           /* start time for calculation       */
 } H_METER;
+
+/**
+  * Bail....
+  */
+void error_exit(const char *, ...);
 
 #endif

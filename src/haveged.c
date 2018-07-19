@@ -35,6 +35,11 @@
 #include <linux/random.h>
 #endif
 
+#ifndef NO_COMMAND_MODE
+#include "havegecmd.h"
+#include <limits.h>
+#endif
+
 #include <errno.h>
 #include "haveged.h"
 #include "havegecollect.h"
@@ -67,7 +72,8 @@ static struct pparams defaults = {
   .sample_in      = INPUT_DEFAULT,
   .sample_out     = OUTPUT_DEFAULT,
   .verbose        = 0,
-  .watermark      = "/proc/sys/kernel/random/write_wakeup_threshold"
+  .watermark      = "/proc/sys/kernel/random/write_wakeup_threshold",
+  .command        = 0
   };
 struct pparams *params = &defaults;
 
@@ -90,12 +96,11 @@ static H_UINT poolSize = 0;
 
 static void daemonize(void);
 static int  get_poolsize(void);
-static void run_daemon(H_PTR handle);
+static void run_daemon(H_PTR handle, const volatile char *path, char *const argv[]);
 static void set_watermark(int level);
 #endif
 
 static void anchor_info(H_PTR h);
-static void error_exit(const char *format, ...);
 static int  get_runsize(unsigned int *bufct, unsigned int *bufrem, char *bp);
 static char *ppSize(char *buffer, double sz);
 static void print_msg(const char *format, ...);
@@ -105,15 +110,22 @@ static void show_meterInfo(H_UINT id, H_UINT event);
 static void tidy_exit(int signum);
 static void usage(int db, int nopts, struct option *long_options, const char **cmds);
 
+static sigset_t mask, omask;
+
 #define  ATOU(a)     (unsigned int)atoi(a)
 /**
  * Entry point
  */
 int main(int argc, char **argv)
 {
+   volatile char *path = strdup(argv[0]);
+   volatile char *arg0 = argv[0];
    static const char* cmds[] = {
       "b", "buffer",      "1", SETTINGR("Buffer size [KW], default: ",COLLECT_BUFSIZE),
       "d", "data",        "1", SETTINGR("Data cache size [KB], with fallback to: ", GENERIC_DCACHE ),
+#ifndef NO_COMMAND_MODE
+      "c", "command",     "1", "Send a command mode to an already running haveged",
+#endif
       "i", "inst",        "1", SETTINGR("Instruction cache size [KB], with fallback to: ", GENERIC_ICACHE),
       "f", "file",        "1", "Sample output file,  default: '" OUTPUT_DEFAULT "', '-' for stdout",
       "F", "Foreground",  "0", "Run daemon in foreground",
@@ -122,7 +134,9 @@ int main(int argc, char **argv)
       "o", "onlinetest",  "1", "[t<x>][c<x>] x=[a[n][w]][b[w]] 't'ot, 'c'ontinuous, default: ta8b",
       "p", "pidfile",     "1", "daemon pidfile, default: " PID_DEFAULT ,
       "s", "source",      "1", "Injection source file, default: '" INPUT_DEFAULT "', '-' for stdin",
+#if  NUMBER_CORES>1
       "t", "threads",     "1", "Number of threads",
+#endif
       "v", "verbose",     "1", "Verbose mask 0=none,1=summary,2=retries,4=timing,8=loop,16=code,32=test",
       "w", "write",       "1", "Set write_wakeup_threshold [bits]",
       "h", "help",        "0", "This help"
@@ -157,11 +171,35 @@ int main(int argc, char **argv)
 #if NUMBER_CORES>1
    params->setup |= MULTI_CORE;
 #endif
+
+   if (access("/etc/initrd-release", F_OK) >= 0) {
+      arg0[0] = '@';
+      path[0] = '/';
+      }
 #ifdef SIGHUP
    signal(SIGHUP, tidy_exit);
 #endif
    signal(SIGINT, tidy_exit);
    signal(SIGTERM, tidy_exit);
+#ifndef NO_COMMAND_MODE
+   signal(SIGPIPE, SIG_IGN);
+#endif
+
+   sigemptyset(&mask);
+#ifdef SIGHUP
+   sigaddset(&mask, SIGHUP);
+#endif
+   sigaddset(&mask, SIGINT);
+   sigaddset(&mask, SIGTERM);
+#ifndef NO_COMMAND_MODE
+   sigaddset(&mask, SIGPIPE);
+#endif
+#if  NUMBER_CORES>1
+   /* Hmmm ... currently the code  does not use pthread_create(3) but fork(2) */
+   pthread_sigmask(SIG_UNBLOCK, &mask, NULL);
+#else
+   sigprocmask(SIG_UNBLOCK, &mask, NULL);
+#endif
    strcpy(short_options,"");
    bufct  = bufrem = 0;
   /**
@@ -221,6 +259,12 @@ int main(int argc, char **argv)
             if (params->buffersz<4)
                error_exit("invalid size %s", optarg);
             break;
+#ifndef NO_COMMAND_MODE
+         case 'c':
+            params->command = optarg;
+            params->setup |= CMD_MODE;
+            break;
+#endif
          case 'd':
             params->d_cache = ATOU(optarg);
             break;
@@ -272,6 +316,74 @@ int main(int argc, char **argv)
             break;
          }
       } while (c!=-1);
+#ifndef NO_COMMAND_MODE
+   if (params->setup & CMD_MODE) {
+      int ret = 0, len;
+      char *ptr, message[PATH_MAX+5], answer[2], cmd[2];
+      fd_set read_fd;
+
+      socket_fd = cmd_connect(params);
+      if (socket_fd < 0) {
+         ret = -1;
+         goto err;
+         }
+      cmd[0] = getcmd(params->command);
+      if (cmd[0] < 0) {
+         ret = -1;
+         goto err;
+         }
+      cmd[1] = '\0';
+      switch (cmd[0]) {
+         char *root;
+         case MAGIC_CHROOT:
+            root = optarg;
+            len = (int)strlen(root);
+            ret = snprintf(message, sizeof(message), "%c\002%c%s%n", cmd[0], (int)(strlen(root) + 1), root, &len);
+            if (ret < 0 || ret >= sizeof(message)) {
+               fprintf(stderr, "%s: can not store message\n", params->daemon);
+               break;
+            }
+            ptr = &message[0];
+            len += 1;
+            safeout(socket_fd, ptr, len);
+            break;
+         case '?':
+         default:
+            ret = -1;
+            break;
+         }
+      answer[0] = '\0';
+      ptr = &answer[0];
+      len = sizeof(answer);
+
+      FD_ZERO(&read_fd);
+      FD_SET(socket_fd, &read_fd);
+
+      do {
+         struct timeval two = {2, 0};
+         ret = select(socket_fd+1, &read_fd, NULL, NULL, &two);
+         if (ret >= 0) break;
+         if (errno != EINTR)
+            error_exit("Select error: %s", strerror(errno));
+         }
+      while (1);
+
+      ret = safein(socket_fd, ptr, len);
+      close(socket_fd);
+      if (ret < 0)
+         goto err;
+      if (answer[0] != '\x6')
+         ret = -1;
+      else
+         ret = 0;
+   err:
+      return ret;
+      }
+   else {
+      socket_fd = cmd_listen(params);
+      fprintf(stderr, "%s: listening socket at %d\n", params->daemon, socket_fd);
+      }
+#endif
    if (params->tests_config == 0)
      params->tests_config = (0 != (params->setup & RUN_AS_APP))? TESTS_DEFAULT_APP : TESTS_DEFAULT_RUN;
    memset(&cmd, 0, sizeof(H_PARAMS));
@@ -348,7 +460,7 @@ int main(int argc, char **argv)
       else run_app(handle, bufct, bufrem);
       }
 #ifndef NO_DAEMON
-   else run_daemon(handle);
+   else run_daemon(handle, path, argv);
 #endif
    havege_destroy(handle);
    exit(0);
@@ -403,9 +515,14 @@ static int get_poolsize(   /* RETURN: number of bits  */
  * Run as a daemon writing to random device entropy pool
  */
 static void run_daemon(    /* RETURN: nothing   */
-   H_PTR h)                /* IN: app instance  */
+   H_PTR h,                /* IN: app instance  */
+   const volatile char *path,
+   char *const argv[])
 {
    int                     random_fd = -1;
+#ifndef NO_COMMAND_MODE
+   int                     conn_fd = -1;
+#endif
    struct rand_pool_info   *output;
 
    if (0 != params->run_level) {
@@ -426,18 +543,79 @@ static void run_daemon(    /* RETURN: nothing   */
      error_exit("Couldn't open random device: %s", strerror(errno));
 
    output = (struct rand_pool_info *) h->io_buf;
-   for(;;) {
-      int current,nbytes,r;
 
+#if  NUMBER_CORES>1
+   pthread_sigmask(SIG_BLOCK, &mask, &omask);
+#else
+   sigprocmask(SIG_BLOCK, &mask, &omask);
+#endif
+   for(;;) {
+      int current,nbytes,r,max=0;
       fd_set write_fd;
+#ifndef NO_COMMAND_MODE
+      fd_set read_fd;
+#endif
+
+      if (params->exit_code > 128)
+         error_exit("Stopping due to signal %d\n", params->exit_code - 128);
+
       FD_ZERO(&write_fd);
+#ifndef NO_COMMAND_MODE
+      FD_ZERO(&read_fd);
+#endif
       FD_SET(random_fd, &write_fd);
+      if (random_fd > max)
+         max = random_fd;
+#ifndef NO_COMMAND_MODE
+      FD_SET(socket_fd, &read_fd);
+      if (socket_fd > max)
+         max = socket_fd;
+      if (conn_fd >= 0) {
+         FD_SET(conn_fd, &read_fd);
+         if (conn_fd > max)
+            max = conn_fd;
+         }
+#endif
       for(;;)  {
-         int rc = select(random_fd+1, NULL, &write_fd, NULL, NULL);
+         struct timespec two = {2, 0};
+#ifndef NO_COMMAND_MODE
+         int rc = pselect(max+1, &read_fd, &write_fd, NULL, &two, &omask);
+#else
+         int rc = pselect(max+1, NULL, &write_fd, NULL, &two, &omask);
+#endif
          if (rc >= 0) break;
+         if (params->exit_code > 128)
+            break;
          if (errno != EINTR)
             error_exit("Select error: %s", strerror(errno));
          }
+      if (params->exit_code > 128)
+         continue;
+
+#ifndef NO_COMMAND_MODE
+      if (FD_ISSET(socket_fd, &read_fd) && conn_fd < 0) {
+# ifdef HAVE_ACCEPT4
+         conn_fd = accept4(socket_fd, NULL, NULL, SOCK_CLOEXEC|SOCK_NONBLOCK);
+         if (conn_fd < 0 && (errno == ENOSYS || errno == ENOTSUP)) {
+# endif
+            conn_fd = accept(socket_fd, NULL, NULL);
+            if (conn_fd >= 0) {
+               fcntl(conn_fd, F_SETFL, O_NONBLOCK);
+               fcntl(conn_fd, F_SETFD, FD_CLOEXEC);
+               }
+# ifdef HAVE_ACCEPT4
+            }
+# endif
+         if (conn_fd >= 0)
+            continue;
+         }
+  
+      if (conn_fd >= 0 && FD_ISSET(conn_fd, &read_fd))
+         conn_fd = socket_handler(conn_fd, path, argv, params);
+#endif
+      if (!FD_ISSET(random_fd, &write_fd))
+         continue;
+
       if (ioctl(random_fd, RNDGETENTCNT, &current) == -1)
          error_exit("Couldn't query entropy-level from kernel");
       /* get number of bytes needed to fill pool */
@@ -488,7 +666,7 @@ static void anchor_info(H_PTR h)
 /**
  * Bail....
  */
-static void error_exit(    /* RETURN: nothing   */
+void error_exit(           /* RETURN: nothing   */
    const char *format,     /* IN: msg format    */
    ...)                    /* IN: varadic args  */
 {
@@ -713,8 +891,8 @@ static void tidy_exit(           /* OUT: nothing      */
    int signum)                   /* IN: signal number */
 {
   params->exit_code = 128 + signum;
-  error_exit("Stopping due to signal %d\n", signum);
 }
+
 /**
  * send usage display to stderr
  */

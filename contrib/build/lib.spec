@@ -70,7 +70,7 @@ make check
 %defattr(-, root, root, -)
 %{_mandir}/man3/libhavege.3*
 %dir %{_includedir}/%{name}
-%{_includedir}/%{name}/havege.h
+%{_includedir}/%{name}/havege*.h
 %doc contrib/build/havege_sample.c
 %{_libdir}/*.so*
 

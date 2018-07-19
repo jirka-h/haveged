@@ -5,6 +5,7 @@
 AC_PREREQ([2.59])
 AC_INIT([haveged],[1.9.2])
 AC_CONFIG_AUX_DIR(config)
+AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE([subdir-objects no-dependencies])
 AC_CONFIG_SRCDIR([src/haveged.c])
@@ -104,17 +105,25 @@ AC_HEADER_TIME
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_SELECT_ARGTYPES
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([__rdtsc floor gettimeofday memset pow select sched_yield sqrt])
+AC_CHECK_FUNCS([__rdtsc accept accept4 bind connect execv floor getsockopt gettimeofday listen memset pow pselect recv sched_yield select send setsockopt socket sqrt])
 
 ## Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h)
+AC_CHECK_HEADERS(limits.h)
 AC_CHECK_HEADERS(sched.h)
 AC_CHECK_HEADERS(semaphore.h)
+AC_CHECK_HEADERS(stdarg.h)
+AC_CHECK_HEADERS(stddef.h)
+AC_CHECK_HEADERS(stdint.h)
+AC_CHECK_HEADERS(stdio.h)
 AC_CHECK_HEADERS(stdlib.h)
 AC_CHECK_HEADERS(string.h)
 AC_CHECK_HEADERS(sys/ioctl.h)
 AC_CHECK_HEADERS(sys/mman.h)
+AC_CHECK_HEADERS(sys/types.h)
+AC_CHECK_HEADERS(sys/socket.h)
+AC_CHECK_HEADERS(sys/un.h)
 AC_CHECK_HEADERS(sys/wait.h)
 AC_CHECK_HEADERS(time.h)
 AC_CHECK_HEADERS(sys/time.h)
@@ -123,6 +132,10 @@ AC_CHECK_HEADERS(cpuid.h)
 AC_CHECK_HEADERS(x86intrin.h)
 AC_CHECK_HEADERS(syslog.h)
 AC_CHECK_HEADERS(linux/random.h)
+
+AH_TEMPLATE([HAVE_STRUCT_UCRED],[User visible structure for SCM_CREDENTIALS message])
+AC_TRY_LINK([#include <sys/socket.h>],
+[struct ucred cred; cred.pid=0;],[AC_DEFINE([HAVE_STRUCT_UCRED],[1],[User visible structure for SCM_CREDENTIALS message])])
 
 AC_CANONICAL_HOST
 
