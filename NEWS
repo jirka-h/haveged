@@ -1,3 +1,6 @@
+v1.9.4 (Aug 11, 2018)
+ * Avoid misleading message if cmd socket is in use
+ 
 v1.9.3 (Aug 10, 2018)
  I (Jirka Hladky) took over haveged upstream development and moved it to GiHub 
  https://github.com/jirka-h/haveged

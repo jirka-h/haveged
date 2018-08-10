@@ -1,3 +1,6 @@
+v1.9.4 (Aug 11, 2018)
+ * Avoid misleading message if cmd socket is in use
+
 v1.9.3 (Aug 10, 2018)
  * Implemented a command mode and use it for chroot - contributed Dr. Werner Fink
 
