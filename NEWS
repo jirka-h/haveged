@@ -1,3 +1,9 @@
+v1.9.3 (Aug 10, 2018)
+ I (Jirka Hladky) took over haveged upstream development and moved it to GiHub 
+ https://github.com/jirka-h/haveged
+ This version implements a command mode and use it for chroot -it was 
+ contributed by Dr. Werner Fink.
+
 v1.9.2 (Nov 16, 1017)
    
    This release cleans up issues that have accumulated since the last release. I retired
