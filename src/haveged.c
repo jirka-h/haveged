@@ -381,7 +381,12 @@ int main(int argc, char **argv)
       }
    else {
       socket_fd = cmd_listen(params);
-      fprintf(stderr, "%s: listening socket at %d\n", params->daemon, socket_fd);
+      if (socket_fd >= 0)
+         fprintf(stderr, "%s: listening socket at %d\n", params->daemon, socket_fd);
+      else if (socket_fd == -2)
+	 fprintf(stderr, "%s: command socket already in use\n", params->daemon);
+      else
+	 fprintf(stderr, "%s: can not initialize command socket: %m\n", params->daemon);
       }
 #endif
    if (params->tests_config == 0)
