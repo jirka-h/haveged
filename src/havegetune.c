@@ -795,6 +795,8 @@ static int vfs_configInfoCache(
          ctype = vfs_configFile(pAnchor, path, vfs_configType);
          strcpy(path+plen, "size");
          size  = vfs_configFile(pAnchor, path, vfs_configInt);
+	 if (size == -1)
+		 size = ctype == 'I' ? GENERIC_ICACHE : GENERIC_DCACHE;
          cfg_cacheAdd(pAnchor, SRC_VFS_INDEX,  pArgs[1], level, ctype, size);
          }
      }
