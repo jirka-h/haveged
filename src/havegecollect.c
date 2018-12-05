@@ -194,10 +194,10 @@ H_COLLECT *havege_ndcreate(/* RETURN: NULL on failure          */
             H_UINT t0=0;
             
             (void)havege_gather(h_ctxt);           /* first sample   */
-            t0 = h_ctxt->havege_tic;
+            t0 = HTICK1;
             for(i=1;i<MININITRAND;i++)
                (void)havege_gather(h_ctxt);        /* warmup rng     */
-            if (h_ctxt->havege_tic==t0) {          /* timer stuck?   */
+            if (HTICK1==t0) {                      /* timer stuck?   */
                h_ptr->error = H_NOTIMER;
                havege_nddestroy(h_ctxt);
                return NULL;
