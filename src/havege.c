@@ -197,12 +197,12 @@ void havege_destroy(       /* RETURN: none            */
          free(temp);
          }
 #ifdef ONLINE_TESTS_ENABLE
-      if (0 != (temp=hptr->testData)) {
+      else if (0 != (temp=hptr->testData)) {
          double *g = ((procShared *)temp)->G;
          hptr->testData = 0;
-         if (0 != g)
-            free(g);
          }
+      if (0 != g)
+         free(g);
 #endif
       if (0 != (htemp=hptr->collector)) {
          hptr->collector = 0;
