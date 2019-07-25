@@ -496,7 +496,8 @@ static int get_poolsize(   /* RETURN: number of bits  */
    void)                   /* IN: nothing             */
 {
    FILE *poolsize_fh,*osrel_fh;
-   unsigned int max_bits,major,minor;
+   unsigned int major,minor;
+   int max_bits;
 
    poolsize_fh = fopen(params->poolsize, "rb");
    if (poolsize_fh) {
