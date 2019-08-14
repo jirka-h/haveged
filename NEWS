@@ -7,11 +7,14 @@ v1.9.3 (Aug 10, 2018)
  This version implements a command mode and use it for chroot -it was 
  contributed by Dr. Werner Fink.
 
-v1.9.2 (Nov 16, 1017)
+v1.9.2 (Nov 16, 2017)
    
    This release cleans up issues that have accumulated since the last release. I retired
    several years ago, and haveged is no longer under active development. This release only
    attempts to collect and document the downstream reports I have received. 
+
+v1.9.1 (Feb 11, 2014)
+   Documentation and sample file touch-up for v1.9.
 
 v1.9   (Feb 10, 2014)
 
