@@ -201,7 +201,7 @@ void havege_destroy(       /* RETURN: none            */
          double *g = ((procShared *)temp)->G;
          hptr->testData = 0;
          if (0 != g)
-          free(g);
+            free(g);
          }
 #endif
       if (0 != (htemp=hptr->collector)) {
