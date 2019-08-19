@@ -26,6 +26,8 @@
 #include <signal.h>
 #include <fcntl.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #ifndef NO_DAEMON
@@ -530,6 +532,7 @@ static void run_daemon(    /* RETURN: nothing   */
    int                     conn_fd = -1;
 #endif
    struct rand_pool_info   *output;
+   struct stat stat_buf;
 
    if (0 != params->run_level) {
       anchor_info(h);
@@ -544,6 +547,10 @@ static void run_daemon(    /* RETURN: nothing   */
      anchor_info(h);
    if (params->low_water>0)
       set_watermark(params->low_water);
+   if ( lstat(params->random_device, &stat_buf) != 0 )
+      error_exit("lstat has failed for the random device \"%s\": %s", params->random_device, strerror(errno));
+   if ( S_ISLNK(stat_buf.st_mode) )
+      error_exit("random device \"%s\" is a link. This is not supported for the security reasons.", params->random_device);
    random_fd = open(params->random_device, O_RDWR);
    if (random_fd == -1)
      error_exit("Couldn't open random device: %s", strerror(errno));
