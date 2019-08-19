@@ -26,9 +26,9 @@
 #include <signal.h>
 #include <fcntl.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #ifndef NO_DAEMON
-#include <unistd.h>
 #include <syslog.h>
 #include <sys/ioctl.h>
 #include <asm/types.h>
