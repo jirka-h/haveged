@@ -1,3 +1,17 @@
+v1.9.5 (Aug 20, 2019)
+ * Added test for /dev/random symlink [Jirka Hladky]
+ * Update to automake 1.16 [Jirka Hladky]
+ * Fix segv at start [Andrew]
+ * Fixed built issue on Cygwin [jbaker6953]
+ * Fix segfault on arm machines (origin/pr/7) [Natanael Copa]
+ * init.d/Makefile.am - add missing dependency [Jackie Huang]
+ * service.redhat - update PIDFile [Pierre-Jean Texier]
+ * Fix type mismatch in get_poolsize [Andreas Schwab]
+ * Fixup upstream changelog [Nicolas Braud-Santoni]
+ * Remove support for CPUID on ia64 (origin/pr/19) [Jérémy Bobbio]
+ * Output some progress during CUSUM and RANDOM EXCURSION test [Sven Hartge]
+ * Diagnostics capture mode now works correctly [Ethan Rahn]
+
 v1.9.4 (Aug 11, 2018)
  * Avoid misleading message if cmd socket is in use
 
