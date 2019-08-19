@@ -117,11 +117,7 @@ typedef struct h_collect {
 
 #ifdef HAVE_ISA_IA64
 #define ARCH "ia64"
-#define CPUID(op,reg) ASM("mov %0=cpuid[%1]"\
-   : "=r" (value)\
-   : "r" (reg))
 #define HARDCLOCK(x) ASM("mov %0=ar.itc" : "=r"(x))
-#define HASCPUID(x) x=1
 #endif
 
 #ifdef HAVE_ISA_SPARC
