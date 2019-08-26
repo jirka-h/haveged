@@ -1,11 +1,13 @@
 [Unit]
 Description=Entropy Daemon based on the HAVEGE algorithm
 Documentation=man:haveged(8) http://www.issihosts.com/haveged/
+DefaultDependencies=no
+Before=sysinit.target shutdown.target systemd-journald.service
 
 [Service]
-Type=simple
 ExecStart=@SBIN_DIR@/haveged -w 1024 -v 1 --Foreground
-SuccessExitStatus=143
+Restart=always
+SuccessExitStatus=137 143
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=sysinit.target
