@@ -8,7 +8,7 @@ v1.9.5 (Aug 20, 2019)
  * service.redhat - update PIDFile [Pierre-Jean Texier]
  * Fix type mismatch in get_poolsize [Andreas Schwab]
  * Fixup upstream changelog [Nicolas Braud-Santoni]
- * Remove support for CPUID on ia64 (origin/pr/19) [Jérémy Bobbio]
+ * Remove support for CPUID on ia64 (origin/pr/19) [Jeremy Bobbio]
  * Output some progress during CUSUM and RANDOM EXCURSION test [Sven Hartge]
  * Diagnostics capture mode now works correctly [Ethan Rahn]
 
@@ -21,7 +21,7 @@ v1.9.3 (Aug 10, 2018)
 v1.9.2 (Nov 16, 2017)
  * Add cross compile fixes contributed by Robert Schwebel
  * Limit watermark max to less than pool size to avoid 100% cpu condition
- * Add service.suse init script contributed by Tomáš Chvátal
+ * Add service.suse init script contributed by Tomas Chvatal
  
 v1.9.1 (Feb 11, 2014)
  * Documentation and sample file touch-up for v1.9.
