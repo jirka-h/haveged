@@ -1,4 +1,4 @@
-v1.9.7 (Sep 30, 2019)
+v1.9.8 (Sep 30, 2019)
 * Fix for Unresolved symbol error_exit in libhavege #20 by pld-gitsync [Jirka Hladky]
 * order after systemd-tmpfiles-setup-dev.service (origin/pr/21) [Christian Hesse]
 * use systemd security features [Christian Hesse]
