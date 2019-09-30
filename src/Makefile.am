@@ -21,13 +21,12 @@ libhavege_la_CPPFLAGS =
 libhavege_la_LDFLAGS = -version-number @HAVEGE_LT_VERSION@
 libhavege_la_LIBADD = @HA_LDFLAGS@
 
-libhavege_la_SOURCES = havege.c havegetune.c havegecollect.c havegetest.c havegecmd.c \
-            cpuid-43.h havege.h havegetune.h havegecollect.h havegetest.h oneiteration.h \
-            havegecmd.h
+libhavege_la_SOURCES = havege.c havegetune.c havegecollect.c havegetest.c \
+            cpuid-43.h havege.h havegetune.h havegecollect.h havegetest.h oneiteration.h
 
-pkginclude_HEADERS = havege.h havegecmd.h
+pkginclude_HEADERS = havege.h
 
-haveged_SOURCES = haveged.c haveged.h
+haveged_SOURCES = haveged.c haveged.h havegecmd.c havegecmd.h
 
 haveged_LDADD = @HA_LDFLAGS@ libhavege.la
 ##libtool_end##
