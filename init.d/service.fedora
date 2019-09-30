@@ -11,9 +11,8 @@ ExecStart=/usr/sbin/haveged -w 1024 -v 1 --Foreground
 Restart=always
 SuccessExitStatus=137 143
 CapabilityBoundingSet=CAP_SYS_ADMIN
-NoNewPrivileges=on
-PrivateDevices=on
-PrivateNetwork=on
+PrivateDevices=true
+PrivateNetwork=true
 ProtectSystem=full
 
 [Install]
