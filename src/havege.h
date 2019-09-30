@@ -30,7 +30,7 @@ extern "C" {
  * header/package version as a numeric major, minor, patch triple. See havege_version()
  * below for useage.
  */
-#define  HAVEGE_PREP_VERSION  "1.9.5"
+#define  HAVEGE_PREP_VERSION  "1.9.7"
 /**
  * Basic types
  */

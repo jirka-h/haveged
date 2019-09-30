@@ -137,7 +137,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libhavege_la_DEPENDENCIES =
 am_libhavege_la_OBJECTS = libhavege_la-havege.lo \
 	libhavege_la-havegetune.lo libhavege_la-havegecollect.lo \
-	libhavege_la-havegetest.lo libhavege_la-havegecmd.lo
+	libhavege_la-havegetest.lo
 libhavege_la_OBJECTS = $(am_libhavege_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -146,7 +146,7 @@ am__v_lt_1 =
 libhavege_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libhavege_la_LDFLAGS) $(LDFLAGS) -o $@
-am_haveged_OBJECTS = haveged.$(OBJEXT)
+am_haveged_OBJECTS = haveged.$(OBJEXT) havegecmd.$(OBJEXT)
 haveged_OBJECTS = $(am_haveged_OBJECTS)
 haveged_DEPENDENCIES = libhavege.la
 AM_V_P = $(am__v_P_@AM_V@)
@@ -334,12 +334,11 @@ lib_LTLIBRARIES = libhavege.la
 libhavege_la_CPPFLAGS = 
 libhavege_la_LDFLAGS = -version-number @HAVEGE_LT_VERSION@
 libhavege_la_LIBADD = @HA_LDFLAGS@
-libhavege_la_SOURCES = havege.c havegetune.c havegecollect.c havegetest.c havegecmd.c \
-            cpuid-43.h havege.h havegetune.h havegecollect.h havegetest.h oneiteration.h \
-            havegecmd.h
+libhavege_la_SOURCES = havege.c havegetune.c havegecollect.c havegetest.c \
+            cpuid-43.h havege.h havegetune.h havegecollect.h havegetest.h oneiteration.h
 
-pkginclude_HEADERS = havege.h havegecmd.h
-haveged_SOURCES = haveged.c haveged.h
+pkginclude_HEADERS = havege.h
+haveged_SOURCES = haveged.c haveged.h havegecmd.c havegecmd.h
 haveged_LDADD = @HA_LDFLAGS@ libhavege.la
 MAINTAINERCLEANFILES = Makefile.in
 all: all-am
@@ -542,9 +541,6 @@ libhavege_la-havegecollect.lo: havegecollect.c
 
 libhavege_la-havegetest.lo: havegetest.c
 	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libhavege_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libhavege_la-havegetest.lo `test -f 'havegetest.c' || echo '$(srcdir)/'`havegetest.c
-
-libhavege_la-havegecmd.lo: havegecmd.c
-	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libhavege_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libhavege_la-havegecmd.lo `test -f 'havegecmd.c' || echo '$(srcdir)/'`havegecmd.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
