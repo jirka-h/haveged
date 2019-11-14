@@ -187,7 +187,7 @@ void havege_tune(          /* RETURN: none               */
    *bp++ = BUILD_CPUID;
 #endif
 #if NUMBER_CORES>1
-   *bp++ = BUILD_THREAD;
+   *bp++ = BUILD_THREADS;
 #endif
 #ifdef ONLINE_TESTS_ENABLE
    *bp++ = BUILD_OLT;
