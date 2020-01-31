@@ -20,6 +20,10 @@ ProtectHome=true
 ProtectHostname=true
 ProtectKernelLogs=true
 ProtectKernelModules=true
+RestrictNamespaces=true
+RestrictRealtime=true
+
+LockPersonality=true
 
 [Install]
 WantedBy=sysinit.target
