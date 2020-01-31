@@ -24,6 +24,7 @@ RestrictNamespaces=true
 RestrictRealtime=true
 
 LockPersonality=true
+MemoryDenyWriteExecute=true
 
 [Install]
 WantedBy=sysinit.target
