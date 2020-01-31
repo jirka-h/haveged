@@ -16,6 +16,10 @@ PrivateTmp=true
 PrivateDevices=true
 PrivateNetwork=true
 ProtectSystem=full
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
 
 [Install]
 WantedBy=sysinit.target
