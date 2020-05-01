@@ -238,6 +238,14 @@ typedef enum {
  *                        H_NOINIT
  */
 H_PTR       havege_create(H_PARAMS *params);
+
+/**
+ * haveger_create() remembers parent pid and uses it to identify deallocating thread.
+ * daemonize() forks parent and effectively loses parent thread.
+ * havege_reparent(void) allows recovering new parent pid before havege_run() is started.
+ */
+void        havege_reparent(H_PTR hptr);
+
 /**
  * Frees all allocated anchor resources. If the multi-core option is used, this
  * method should be called from a signal handler to prevent zombie processes.

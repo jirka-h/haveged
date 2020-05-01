@@ -538,8 +538,10 @@ static void run_daemon(    /* RETURN: nothing   */
       anchor_info(h);
       return;
       }
-   if (params->foreground==0)
+   if (params->foreground==0) {
      daemonize();
+     havege_reparent(handle);
+   }
    else printf ("%s starting up\n", params->daemon);
    if (0 != havege_run(h))
       error_exit("Couldn't initialize HAVEGE rng %d", h->error);

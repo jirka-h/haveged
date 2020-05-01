@@ -178,6 +178,19 @@ H_PTR havege_create(             /* RETURN: app state    */
    havege_ndsetup(h);
    return h;
 }
+
+void havege_reparent(
+  H_PTR hptr)
+{
+#if NUMBER_CORES>1
+   H_THREAD *t = (H_THREAD *)hptr->threads;
+   if (0 == t)
+      return; /* single-threaded */
+
+   t->main = getpid();
+#endif
+}
+
 /**
  * Destructor. In a multi-collector build, this method should be called from a signal handler
  * to avoid creating processes.
