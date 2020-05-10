@@ -41,10 +41,10 @@ if test "x$enable_diagnostic" = "xyes"; then
    AC_DEFINE(RAW_OUT_ENABLE, 1, [Define to 1 for capture diagnostic])
    AC_DEFINE(RAW_IN_ENABLE, 1, [Define to 1 for injection diagnostic])
    enable_daemon="no";
-elif test "x$enable_diagnostic" == "xcapture"; then
+elif test "x$enable_diagnostic" = "xcapture"; then
    AC_DEFINE(RAW_OUT_ENABLE, 1, [Define to 1 for capture diagnostic])
    enable_daemon="no";
-elif test "x$enable_diagnostic" == "xinject"; then
+elif test "x$enable_diagnostic" = "xinject"; then
    AC_DEFINE(RAW_IN_ENABLE, 1, [Define to 1 for injection diagnostic])
    enable_daemon="no";
 fi
@@ -88,9 +88,9 @@ AC_ARG_ENABLE(tune,
 if test "x$enable_tune" = "xyes"; then
    AC_DEFINE(TUNING_CPUID_ENABLE, 1, [Define to 1 to tune with host cpuid])
    AC_DEFINE(TUNING_VFS_ENABLE, 1, [Define to 1 to tune with host vfs])
-elif test "x$enable_tune" == "xcpuid"; then
+elif test "x$enable_tune" = "xcpuid"; then
    AC_DEFINE(TUNING_CPUID_ENABLE, 1, [Define to 1 to tune with host cpuid])
-elif test "x$enable_tune" == "xvfs"; then
+elif test "x$enable_tune" = "xvfs"; then
    AC_DEFINE(TUNING_VFS_ENABLE, 1, [Define to 1 to tune wiht host vfs])
 fi
 
