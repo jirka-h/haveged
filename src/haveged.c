@@ -1,6 +1,7 @@
 /**
  ** Simple entropy harvester based upon the havege RNG
  **
+ ** Copyright 2018-2020 Jirka Hladky hladky DOT jiri AT gmail DOT com
  ** Copyright 2009-2014 Gary Wuertz gary@issiweb.com
  ** Copyright 2011-2012 BenEleventh Consulting manolson@beneleventh.com
  **
@@ -384,12 +385,17 @@ int main(int argc, char **argv)
    else {
       socket_fd = cmd_listen(params);
       if (socket_fd >= 0)
-         fprintf(stderr, "%s: listening socket at %d\n", params->daemon, socket_fd);
-      else if (socket_fd == -2)
-	 fprintf(stderr, "%s: command socket already in use\n", params->daemon);
-      else
-	 fprintf(stderr, "%s: can not initialize command socket: %m\n", params->daemon);
+         fprintf(stderr, "%s: command socket is listening at fd %d\n", params->daemon, socket_fd);
+      else {
+        if (socket_fd == -2) {
+	        fprintf(stderr, "%s: command socket already in use\n", params->daemon);
+	        fprintf(stderr, "%s: please check if there is another instance of haveged running\n", params->daemon);
+	        fprintf(stderr, "%s: disabling command mode for this instance\n", params->daemon);
+        } else {
+	        fprintf(stderr, "%s: can not initialize command socket: %m\n", params->daemon);
+        }
       }
+    }
 #endif
    if (params->tests_config == 0)
      params->tests_config = (0 != (params->setup & RUN_AS_APP))? TESTS_DEFAULT_APP : TESTS_DEFAULT_RUN;
@@ -576,27 +582,36 @@ static void run_daemon(    /* RETURN: nothing   */
 
       FD_ZERO(&write_fd);
 #ifndef NO_COMMAND_MODE
-      FD_ZERO(&read_fd);
+      if (socket_fd >= 0) {
+        FD_ZERO(&read_fd);
+      }
 #endif
       FD_SET(random_fd, &write_fd);
       if (random_fd > max)
          max = random_fd;
 #ifndef NO_COMMAND_MODE
-      FD_SET(socket_fd, &read_fd);
-      if (socket_fd > max)
-         max = socket_fd;
-      if (conn_fd >= 0) {
-         FD_SET(conn_fd, &read_fd);
-         if (conn_fd > max)
-            max = conn_fd;
-         }
+      if (socket_fd >= 0) {
+        FD_SET(socket_fd, &read_fd);
+        if (socket_fd > max)
+           max = socket_fd;
+        if (conn_fd >= 0) {
+           FD_SET(conn_fd, &read_fd);
+           if (conn_fd > max)
+              max = conn_fd;
+           }
+       } 
 #endif
       for(;;)  {
          struct timespec two = {2, 0};
+         int rc;
 #ifndef NO_COMMAND_MODE
-         int rc = pselect(max+1, &read_fd, &write_fd, NULL, &two, &omask);
+         if (socket_fd >= 0) {
+           rc = pselect(max+1, &read_fd, &write_fd, NULL, &two, &omask);
+         } else {
+           rc = pselect(max+1, NULL, &write_fd, NULL, &two, &omask);
+         }
 #else
-         int rc = pselect(max+1, NULL, &write_fd, NULL, &two, &omask);
+         rc = pselect(max+1, NULL, &write_fd, NULL, &two, &omask);
 #endif
          if (rc >= 0) break;
          if (params->exit_code > 128)
@@ -608,7 +623,7 @@ static void run_daemon(    /* RETURN: nothing   */
          continue;
 
 #ifndef NO_COMMAND_MODE
-      if (FD_ISSET(socket_fd, &read_fd) && conn_fd < 0) {
+      if ( socket_fd >= 0 && FD_ISSET(socket_fd, &read_fd) && conn_fd < 0) {
 # ifdef HAVE_ACCEPT4
          conn_fd = accept4(socket_fd, NULL, NULL, SOCK_CLOEXEC|SOCK_NONBLOCK);
          if (conn_fd < 0 && (errno == ENOSYS || errno == ENOTSUP)) {

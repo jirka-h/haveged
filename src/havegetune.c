@@ -1,6 +1,7 @@
 /**
  ** Determine HAVEGE environment
  **
+ ** Copyright 2018-2020 Jirka Hladky hladky DOT jiri AT gmail DOT com
  ** Copyright 2009-2014 Gary Wuertz gary@issiweb.com
  ** Copyright 2011-2012 BenEleventh Consulting manolson@beneleventh.com
  **
