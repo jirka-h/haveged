@@ -11993,12 +11993,12 @@ $as_echo "#define RAW_OUT_ENABLE 1" >>confdefs.h
 $as_echo "#define RAW_IN_ENABLE 1" >>confdefs.h
 
    enable_daemon="no";
-elif test "x$enable_diagnostic" == "xcapture"; then
+elif test "x$enable_diagnostic" = "xcapture"; then
 
 $as_echo "#define RAW_OUT_ENABLE 1" >>confdefs.h
 
    enable_daemon="no";
-elif test "x$enable_diagnostic" == "xinject"; then
+elif test "x$enable_diagnostic" = "xinject"; then
 
 $as_echo "#define RAW_IN_ENABLE 1" >>confdefs.h
 
@@ -12078,11 +12078,11 @@ $as_echo "#define TUNING_CPUID_ENABLE 1" >>confdefs.h
 
 $as_echo "#define TUNING_VFS_ENABLE 1" >>confdefs.h
 
-elif test "x$enable_tune" == "xcpuid"; then
+elif test "x$enable_tune" = "xcpuid"; then
 
 $as_echo "#define TUNING_CPUID_ENABLE 1" >>confdefs.h
 
-elif test "x$enable_tune" == "xvfs"; then
+elif test "x$enable_tune" = "xvfs"; then
 
 $as_echo "#define TUNING_VFS_ENABLE 1" >>confdefs.h
 
