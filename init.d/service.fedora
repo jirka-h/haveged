@@ -6,7 +6,7 @@ After=systemd-tmpfiles-setup-dev.service
 Before=sysinit.target shutdown.target systemd-journald.service
 
 [Service]
-ExecStart=/usr/sbin/haveged -w 1024 -v 1 --Foreground
+ExecStart=@SBIN_DIR@/haveged -w 1024 -v 1 --Foreground
 Restart=always
 SuccessExitStatus=137 143
 
