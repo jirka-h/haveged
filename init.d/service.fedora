@@ -9,10 +9,25 @@ Before=sysinit.target shutdown.target systemd-journald.service
 ExecStart=/usr/sbin/haveged -w 1024 -v 1 --Foreground
 Restart=always
 SuccessExitStatus=137 143
+
+SecureBits=noroot-locked
 CapabilityBoundingSet=CAP_SYS_ADMIN
+PrivateTmp=true
 PrivateDevices=true
 PrivateNetwork=true
 ProtectSystem=full
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+RestrictNamespaces=true
+RestrictRealtime=true
+
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+SystemCallFilter=@basic-io @file-system @io-event @network-io @signal
+SystemCallFilter=arch_prctl brk ioctl mprotect sysinfo
 
 [Install]
 WantedBy=sysinit.target
