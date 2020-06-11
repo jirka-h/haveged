@@ -12,7 +12,8 @@ SuccessExitStatus=137 143
 
 SecureBits=noroot-locked
 CapabilityBoundingSet=CAP_SYS_ADMIN
-PrivateTmp=true
+# We can *not* set PrivateTmp=true as it can cause an ordering cycle.
+PrivateTmp=false
 PrivateDevices=true
 PrivateNetwork=true
 ProtectSystem=full
