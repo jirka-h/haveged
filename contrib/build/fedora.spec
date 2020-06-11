@@ -116,7 +116,7 @@ fi
 
 
 %changelog
-* Tue 09 Jun 2020 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.9-1
+* Tue Jun 09 2020 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.9-1
  - Update to 1.9.9
 
 * Mon Sep 30 2019 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.8-1
