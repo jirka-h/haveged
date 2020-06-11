@@ -1,7 +1,7 @@
 Summary:        A Linux entropy source using the HAVEGE algorithm
 Name:           haveged
 Version:        1.9.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 URL:            https://github.com/jirka-h/haveged
 Source0:        https://github.com/jirka-h/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -58,6 +58,7 @@ make install DESTDIR=%{buildroot} INSTALL="install -p"
 chmod 0644 COPYING README ChangeLog AUTHORS
 
 #Install systemd service file
+sed -e 's:@SBIN_DIR@:%{_sbindir}:g' -i init.d/service.fedora
 install -Dpm 0644 init.d/service.fedora %{buildroot}%{_unitdir}/%{name}.service
 
 # We don't ship .la files.
@@ -116,8 +117,14 @@ fi
 
 
 %changelog
+* Thu Jun 11 2020 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.9-2
+ - Fixed haveged.service file
+
 * Tue Jun 09 2020 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.9-1
  - Update to 1.9.9
+
+* Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
 * Mon Sep 30 2019 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.8-1
  - Update to 1.9.8
