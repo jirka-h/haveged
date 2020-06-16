@@ -1,3 +1,15 @@
+v1.9.11 (Jun 11, 2020)
+* updated version reported by program [Jirka Hladky]
+
+v1.9.10 (Jun 11, 2020)
+* fix ordering cycle with private tmp [Christian Hesse]
+
+v1.9.9 (Jun 9, 2020)
+* Updated systemd service file [Nicolas Braud-Santoni]
+* Bump soname [Nicolas Braud-Santoni]
+* Fix crash on shutdown in threaded mode [Sergei Trofimovich]
+* Fix compilation with --enable-threads [Lars Wendler]
+
 v1.9.8 (Sep 30, 2019)
 * Fix for Unresolved symbol error_exit in libhavege #20 by pld-gitsync [Jirka Hladky]
 * order after systemd-tmpfiles-setup-dev.service (origin/pr/21) [Christian Hesse]
