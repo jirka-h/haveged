@@ -1,6 +1,6 @@
 Summary:        A Linux entropy source using the HAVEGE algorithm
 Name:           haveged
-Version:        1.9.11
+Version:        1.9.12
 Release:        1%{?dist}
 License:        GPLv3+
 URL:            https://github.com/jirka-h/haveged
@@ -117,6 +117,9 @@ fi
 
 
 %changelog
+* Thu Jun 18 2020 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.12-1
+ - Update to 1.9.12
+
 * Fri Jun 12 2020 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.11-1
  - Update to 1.9.11
 

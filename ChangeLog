@@ -1,3 +1,6 @@
+v1.9.12 (Jun 18, 2020)
+* fix a memory leak in havege_destroy [Anakin Zhang]
+
 v1.9.11 (Jun 11, 2020)
 * updated version reported by program [Jirka Hladky]
 
