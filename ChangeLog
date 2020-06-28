@@ -1,3 +1,7 @@
+v1.9.13 (Jun 28, 2020)
+* added support for --version [Jirka Hladky]
+* updated systemd service file [Jirka Hladky]
+
 v1.9.12 (Jun 18, 2020)
 * fix a memory leak in havege_destroy [Anakin Zhang]
 

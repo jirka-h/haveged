@@ -27,8 +27,9 @@ RestrictRealtime=true
 LockPersonality=true
 MemoryDenyWriteExecute=true
 SystemCallArchitectures=native
-SystemCallFilter=@basic-io @file-system @io-event @network-io @signal
-SystemCallFilter=arch_prctl brk ioctl mprotect sysinfo
+SystemCallFilter=@system-service
+SystemCallFilter=~@mount
+SystemCallErrorNumber=EPERM
 
 [Install]
 WantedBy=sysinit.target
