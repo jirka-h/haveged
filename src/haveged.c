@@ -55,7 +55,7 @@
 
 // {{{ VERSION_TEXT
 static const char* VERSION_TEXT =
-	"haveged %s\n\n"
+  "haveged %s\n\n"
   "Copyright (C) 2018-2020 Jirka Hladky <hladky.jiri@gmail.com>\n"
   "Copyright (C) 2009-2014 Gary Wuertz <gary@issiweb.com>\n"
   "Copyright (C) 2011-2012 BenEleventh Consulting <manolson@beneleventh.com>\n\n"
@@ -470,7 +470,7 @@ int main(int argc, char **argv)
       if (params->run_level==1)
         anchor_info(handle);
       else if (0==(params->setup&(INJECT|CAPTURE))) {
-        /* must specify range with --nunber or --run > 1 but not both */
+        /* must specify range with --number or --run > 1 but not both */
         if (params->run_level>1) {
           if (0==(params->setup&RANGE_SPEC)) {        /* --run specified    */
             bufct  = params->run_level/sizeof(H_UINT);
@@ -807,7 +807,7 @@ static int injectFile(     /* RETURN: not used  */
 /**
  * Pretty print the collection size
  */
-static char *ppSize(       /* RETURN: the formated size  */
+static char *ppSize(       /* RETURN: the formatted size */
    char *buffer,           /* IN: work space             */
    double sz)              /* IN: the size               */
 {
