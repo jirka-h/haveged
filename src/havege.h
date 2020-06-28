@@ -29,9 +29,9 @@ extern "C" {
 #endif
 /**
  * header/package version as a numeric major, minor, patch triple. See havege_version()
- * below for useage.
+ * below for usage.
  */
-#define  HAVEGE_PREP_VERSION  "1.9.12"
+#define  HAVEGE_PREP_VERSION  "1.9.13"
 /**
  * Basic types
  */

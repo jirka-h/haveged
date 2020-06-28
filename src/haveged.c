@@ -52,6 +52,18 @@
 #define STRZ(a) #a
 #define SETTINGL(msg,val) STRZ(val) msg
 #define SETTINGR(msg,val) msg STRZ(val)
+
+// {{{ VERSION_TEXT
+static const char* VERSION_TEXT =
+	"haveged %s\n\n"
+  "Copyright (C) 2018-2020 Jirka Hladky <hladky.jiri@gmail.com>\n"
+  "Copyright (C) 2009-2014 Gary Wuertz <gary@issiweb.com>\n"
+  "Copyright (C) 2011-2012 BenEleventh Consulting <manolson@beneleventh.com>\n\n"
+  "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n"
+  "This is free software: you are free to change and redistribute it.\n"
+  "There is NO WARRANTY, to the extent permitted by law.\n";
+// }}} VERSION_TEXT
+
 /**
  * Parameters
  */
@@ -142,6 +154,7 @@ int main(int argc, char **argv)
 #endif
       "v", "verbose",     "1", "Verbose mask 0=none,1=summary,2=retries,4=timing,8=loop,16=code,32=test",
       "w", "write",       "1", "Set write_wakeup_threshold [bits]",
+      "V", "version",     "0", "Print version information and exit",
       "h", "help",        "0", "This help"
       };
    static int nopts = sizeof(cmds)/(4*sizeof(char *));
@@ -315,6 +328,9 @@ int main(int argc, char **argv)
          case '?':
          case 'h':
             usage(0, nopts, long_options, cmds);
+         case 'V':
+            printf(VERSION_TEXT, HAVEGE_PREP_VERSION);
+            exit(EXIT_SUCCESS);
          case -1:
             break;
          }
