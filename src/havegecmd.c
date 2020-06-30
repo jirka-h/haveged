@@ -191,7 +191,7 @@ int getcmd(                        /* RETURN: success or error      */
       const char* opt;
    } cmds[] = {
       { "root=",      MAGIC_CHROOT, 1, NULL },      /* New root */
-      {}
+      {0}
    }, *cmd = cmds;
    int ret = -1;
 
@@ -227,7 +227,7 @@ int socket_handler(                /* RETURN: closed file descriptor        */
    char *const argv[],             /* IN: arguments for the haveged process */
    struct pparams *params)         /* IN: input params                      */
 {
-   struct ucred cred = {};
+   struct ucred cred = {0};
    unsigned char magic[2], *ptr;
    char *enqry;
    char *optarg = NULL;
