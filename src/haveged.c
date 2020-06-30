@@ -530,7 +530,7 @@ static int get_poolsize(   /* RETURN: number of bits  */
       fclose(poolsize_fh);
       osrel_fh = fopen(params->os_rel, "rb");
       if (osrel_fh) {
-         if (fscanf(osrel_fh,"%d.%d", &major, &minor)<2)
+         if (fscanf(osrel_fh,"%u.%u", &major, &minor)<2)
            major = minor = 0;
          fclose(osrel_fh);
          if (major==2 && minor==4) max_bits *= 8;

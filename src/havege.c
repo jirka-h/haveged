@@ -321,7 +321,7 @@ int  havege_status_dump(   /* RETURN: output length   */
       havege_status(hptr, &status);
       switch(topic) {
          case H_SD_TOPIC_BUILD:
-            n += snprintf(buf, len, "ver: %s; arch: %s; vend: %s; build: (%s); collect: %dK",
+            n += snprintf(buf, len, "ver: %s; arch: %s; vend: %s; build: (%s); collect: %uK",
                status.version,
                hptr->arch,
                status.vendor,
@@ -330,7 +330,7 @@ int  havege_status_dump(   /* RETURN: output length   */
                );
             break;
          case H_SD_TOPIC_TUNE:
-            n += snprintf(buf, len, "cpu: (%s); data: %dK (%s); inst: %dK (%s); idx: %d/%d; sz: %d/%d",
+            n += snprintf(buf, len, "cpu: (%s); data: %uK (%s); inst: %uK (%s); idx: %u/%u; sz: %u/%u",
                status.cpuSources,
                status.d_cache,
                status.d_cacheSources,
@@ -347,16 +347,16 @@ int  havege_status_dump(   /* RETURN: output length   */
                if (strlen(status.tot_tests)>0) {
                   n += snprintf(buf+n, len-n, "tot tests(%s): ", status.tot_tests);
                   if ((m = status.n_tests[ H_OLT_TOT_A_P] + status.n_tests[ H_OLT_TOT_A_F])>0)
-                     n += snprintf(buf+n, len-n, "A:%d/%d ", status.n_tests[ H_OLT_TOT_A_P], m);
+                     n += snprintf(buf+n, len-n, "A:%u/%u ", status.n_tests[ H_OLT_TOT_A_P], m);
                   if ((m = status.n_tests[ H_OLT_TOT_B_P] + status.n_tests[ H_OLT_TOT_B_F])>0)
-                     n += snprintf(buf+n, len, "B:%d/%d ", status.n_tests[ H_OLT_TOT_B_P], m);
+                     n += snprintf(buf+n, len, "B:%u/%u ", status.n_tests[ H_OLT_TOT_B_P], m);
                   }
                if (strlen(status.prod_tests)>0) {
                   n += snprintf(buf+n, len-n, "continuous tests(%s): ", status.prod_tests);
                   if ((m = status.n_tests[ H_OLT_PROD_A_P] + status.n_tests[ H_OLT_PROD_A_F])>0)
-                     n += snprintf(buf+n, len-n, "A:%d/%d ", status.n_tests[ H_OLT_PROD_A_P], m);
+                     n += snprintf(buf+n, len-n, "A:%u/%u ", status.n_tests[ H_OLT_PROD_A_P], m);
                   if ((m = status.n_tests[ H_OLT_PROD_B_P] + status.n_tests[ H_OLT_PROD_B_F])>0)
-                     n += snprintf(buf+n, len, "B:%d/%d ", status.n_tests[ H_OLT_PROD_B_P], m);
+                     n += snprintf(buf+n, len, "B:%u/%u ", status.n_tests[ H_OLT_PROD_B_P], m);
                   }
                if (n>0)
                   n += snprintf(buf+n, len-n, " last entropy estimate %g", status.last_test8);
@@ -374,7 +374,7 @@ int  havege_status_dump(   /* RETURN: output length   */
                      break;
                   factor /= 1024.0;
                   }
-               n = snprintf(buf, len, "fills: %d, generated: %.4g %c bytes",
+               n = snprintf(buf, len, "fills: %u, generated: %.4g %c bytes",
                   hptr->n_fills,
                   sz / factor,
                   units[i]
@@ -406,11 +406,11 @@ const char *havege_version(const char *version)
       H_UINT p, p_interface, p_revision, p_patch;
       
 #ifdef HAVEGE_LIB_VERSION
-      sscanf(HAVEGE_LIB_VERSION, "%d:%d:%d", &l_interface, &l_revision, &l_age);
+      sscanf(HAVEGE_LIB_VERSION, "%u:%u:%u", &l_interface, &l_revision, &l_age);
 #endif
       (void)l_interface;(void)l_revision;(void)l_age;(void)p_patch;  /* No check for now */
 
-      p = sscanf(version, "%d.%d.%d", &p_interface, &p_revision, &p_patch);
+      p = sscanf(version, "%u.%u.%u", &p_interface, &p_revision, &p_patch);
       if (p!=3 || p_interface != 1 || p_revision != 9)
          return NULL;
       }
