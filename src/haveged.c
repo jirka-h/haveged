@@ -328,6 +328,7 @@ int main(int argc, char **argv)
          case '?':
          case 'h':
             usage(0, nopts, long_options, cmds);
+            /* fallthrough */
          case 'V':
             printf(VERSION_TEXT, HAVEGE_PREP_VERSION);
             exit(EXIT_SUCCESS);
@@ -762,12 +763,16 @@ static int get_runsize(    /* RETURN: the size        */
    switch(*suffix) {
       case 't': case 'T':
          p2 += 1;
+         /* fallthrough */
       case 'g': case 'G':
          p2 += 1;
+         /* fallthrough */
       case 'm': case 'M':
          p2 += 1;
+         /* fallthrough */
       case 'k': case 'K':
          p2 += 1;
+         /* fallthrough */
       case 0:
          break;
       default:
