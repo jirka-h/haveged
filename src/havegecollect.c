@@ -458,7 +458,7 @@ static void havege_ndinit(       /* RETURN: None                     */
       if (0 != (h_ptr->havege_opts & H_DEBUG_COMPILE)) {
          h_ptr->print_msg("Address %u=%p\n", i, addr[i]);
          }
-      RESULT[i] = abs(addr[i] - addr[LOOP_CT]);
+      RESULT[i] = labs(addr[i] - addr[LOOP_CT]);
       if (i > 0 && 0 != (h_ptr->havege_opts & H_DEBUG_LOOP)) {
          h_ptr->print_msg("Loop %u: offset=%u, delta=%u\n", i,RESULT[i],RESULT[i-1]-RESULT[i]);
          }
