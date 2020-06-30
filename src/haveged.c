@@ -408,7 +408,7 @@ int main(int argc, char **argv)
 	        fprintf(stderr, "%s: please check if there is another instance of haveged running\n", params->daemon);
 	        fprintf(stderr, "%s: disabling command mode for this instance\n", params->daemon);
         } else {
-	        fprintf(stderr, "%s: can not initialize command socket: %m\n", params->daemon);
+	        fprintf(stderr, "%s: can not initialize command socket: %s\n", params->daemon, strerror(errno));
         }
       }
     }
