@@ -251,10 +251,12 @@ static H_UINT aisProcedureA(  /* RETURN: bits used             */
       case TEST_INIT:
          p->bytesUsed = 0;
          p->procRetry = 0;
+         /* fallthrough */
       case TEST_RETRY:
          p->procState = TEST_INPUT;
          p->testState = TEST_INIT;
          p->testId = p->testRun   = 0;
+         /* fallthrough */
       case TEST_INPUT:
          p->data  = (H_UINT8 *)buffer;
          p->range = sz * sizeof(H_UINT) <<3;
@@ -277,6 +279,7 @@ static H_UINT aisProcedureA(  /* RETURN: bits used             */
             else if (p->testState == TEST_INPUT)
                return 0;
             }
+            /* fallthrough */
       case TEST_EVAL:
          p->procState = TEST_DONE;
          for (r = i = 0;i<p->testRun;i++)
@@ -330,10 +333,12 @@ static H_UINT aisProcedureB(  /* RETURN: bits used             */
       case TEST_INIT:
          p->bitsUsed = 0;
          p->procRetry = 0;
+         /* fallthrough */
       case TEST_RETRY:
          p->testId = p->testNbr = 0;
          p->procState = TEST_INPUT;
          p->testState = TEST_INIT;
+         /* fallthrough */
       case TEST_INPUT:
          p->noise = buffer;
          p->range = sz * BITS_PER_H_UINT;
@@ -353,6 +358,7 @@ static H_UINT aisProcedureB(  /* RETURN: bits used             */
          context->szCarry = ct;
          if (p->testState == TEST_INPUT)
             return 0;
+         /* fallthrough */
       case TEST_EVAL:
          p->procState = TEST_DONE;
          for (i=r=0;i<p->testNbr;i++)
@@ -408,6 +414,7 @@ static H_UINT aisSeq(      /* RETURN: last bit index  */
          p->full = 0;
          p->testState = TEST_INPUT;
          SAVE(0,0,0);
+         /* fallthrough */
       case TEST_INPUT:
          RESTORE(j, hilf, deadman);
          offs %= p->range;
@@ -451,6 +458,7 @@ static H_UINT aisSeq(      /* RETURN: last bit index  */
          p->bitsUsed += i;
          if (p->testState == TEST_INPUT)
             break;
+         /* fallthrough */
       case TEST_EVAL:
          if (tid==1) {
             double q[2];
@@ -690,10 +698,12 @@ static H_UINT fips140(     /* RETURN: updated bit offset */
       case TEST_INIT:
          p->testState = TEST_INPUT;
          p->bridge = 0;
+         /* fallthrough */
       case TEST_INPUT:
          offs = copyBits(p, offs, FIPS_USED);
          if (p->testState!=TEST_EVAL)
             break;
+         /* fallthrough */
       case TEST_EVAL:
          maxRun = ones = runLength = 0;
          memset(poker, 0, 16*sizeof(H_UINT));
@@ -765,10 +775,12 @@ static H_UINT test0(       /* RETURN: updated bit offset */
       case TEST_INIT:
          p->testState = TEST_INPUT;
          p->bridge = 0;
+         /* fallthrough */
       case TEST_INPUT:
          offs = copyBits(p, offs, TEST0_USED);
          if (p->testState!=TEST_EVAL)
             break;
+         /* fallthrough */
       case TEST_EVAL:
          qsort(p->aux, TEST0_LENGTH, 6, test0cmp);
          for (i=6,j=0;i<TEST0_LENGTH && j==0;i+=6)
@@ -888,6 +900,7 @@ static H_UINT test6a(      /* RETURN: bit offset      */
       case TEST_INIT:
          j = p->counter[0] = 0;
          p->testState = TEST_INPUT;
+         /* fallthrough */
       case TEST_INPUT:
          {
             BITSTREAM_OPEN(p->noise,offs);
@@ -923,6 +936,7 @@ static H_UINT test6a(      /* RETURN: bit offset      */
                break;
                }
          }
+         /* fallthrough */
       case TEST_EVAL:
          p->results[p->testNbr].finalValue = (double)(p->counter[0]) / (double) AIS_LENGTH;
          r = tid << 8;
@@ -958,6 +972,7 @@ static H_UINT test8(       /* RETURN: bit offset      */
          memset(p->lastpos, 0, 256*sizeof(H_UINT));
          SAVE8(0,0,0,0.0);
          p->testState  = TEST_INPUT;
+         /* fallthrough */
       case TEST_INPUT:
          RESTORE8(k,j,hilf,TG);
          r = p->range - offs;
@@ -998,6 +1013,7 @@ static H_UINT test8(       /* RETURN: bit offset      */
          p->bitsUsed += i;
          if (p->testState == TEST_INPUT)
             break;
+         /* fallthrough */
       case TEST_EVAL:
          tps->lastCoron = p->results[p->testNbr].finalValue = TG/(double)K;
          r = tid<<8;

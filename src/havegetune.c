@@ -516,10 +516,12 @@ static void cpuid_configAmd(
          for(i=0;i<n;i++)
             cfg_bitSet(&w->cpuMap, i);
          cfg_cpuAdd(anchor, SRC_CPUID_AMD8, w);
+         /* fallthrough */
       case 6:
          cpuid(0x80000006,0,regs);
          cfg_cacheAdd(anchor, SRC_CPUID_AMD6, -1, 2, 'U', (regs[ECX]>>16) & 0xffff);
          cfg_cacheAdd(anchor, SRC_CPUID_AMD6, -1, 3, 'U', ((regs[EDX]>>18) & 0x3fff)<<9);
+         /* fallthrough */
       case 5:
          cpuid(0x80000005,0,regs);
          cfg_cacheAdd(anchor, SRC_CPUID_AMD5, -1, 1, 'D', (regs[ECX]>>24) & 0xff);

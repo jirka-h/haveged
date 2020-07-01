@@ -328,6 +328,7 @@ int main(int argc, char **argv)
          case '?':
          case 'h':
             usage(0, nopts, long_options, cmds);
+            /* fallthrough */
          case 'V':
             printf(VERSION_TEXT, HAVEGE_PREP_VERSION);
             exit(EXIT_SUCCESS);
@@ -408,7 +409,7 @@ int main(int argc, char **argv)
 	        fprintf(stderr, "%s: please check if there is another instance of haveged running\n", params->daemon);
 	        fprintf(stderr, "%s: disabling command mode for this instance\n", params->daemon);
         } else {
-	        fprintf(stderr, "%s: can not initialize command socket: %m\n", params->daemon);
+	        fprintf(stderr, "%s: can not initialize command socket: %s\n", params->daemon, strerror(errno));
         }
       }
     }
@@ -530,7 +531,7 @@ static int get_poolsize(   /* RETURN: number of bits  */
       fclose(poolsize_fh);
       osrel_fh = fopen(params->os_rel, "rb");
       if (osrel_fh) {
-         if (fscanf(osrel_fh,"%d.%d", &major, &minor)<2)
+         if (fscanf(osrel_fh,"%u.%u", &major, &minor)<2)
            major = minor = 0;
          fclose(osrel_fh);
          if (major==2 && minor==4) max_bits *= 8;
@@ -762,12 +763,16 @@ static int get_runsize(    /* RETURN: the size        */
    switch(*suffix) {
       case 't': case 'T':
          p2 += 1;
+         /* fallthrough */
       case 'g': case 'G':
          p2 += 1;
+         /* fallthrough */
       case 'm': case 'M':
          p2 += 1;
+         /* fallthrough */
       case 'k': case 'K':
          p2 += 1;
+         /* fallthrough */
       case 0:
          break;
       default:
