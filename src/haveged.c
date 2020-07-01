@@ -359,7 +359,7 @@ int main(int argc, char **argv)
             root = optarg;
             len = (int)strlen(root);
             ret = snprintf(message, sizeof(message), "%c\002%c%s%n", cmd[0], (int)(strlen(root) + 1), root, &len);
-            if (ret < 0 || ret >= sizeof(message)) {
+            if (ret < 0 || (unsigned) ret >= sizeof(message)) {
                fprintf(stderr, "%s: can not store message\n", params->daemon);
                break;
             }
@@ -687,7 +687,7 @@ static void set_watermark( /* RETURN: nothing   */
 {
    FILE *wm_fh;
 
-   if (level > (poolSize - 32))
+   if ( (H_UINT) level > (poolSize - 32))
       level = poolSize - 32;
    wm_fh = fopen(params->watermark, "w");
    if (wm_fh) {
