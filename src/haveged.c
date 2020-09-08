@@ -694,6 +694,9 @@ static void set_watermark( /* RETURN: nothing   */
       fprintf(wm_fh, "%d\n", level);
       fclose(wm_fh);
       }
+   else if (errno == EACCES)
+       fprintf(stderr, "No access to %s, can't set watermark (maybe running in a container?)\n",
+               params->watermark);
    else error_exit("Fail:set_watermark()!");
 }
 #endif
