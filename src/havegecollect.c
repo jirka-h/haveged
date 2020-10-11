@@ -334,6 +334,10 @@ else if (0 != (h_ctxt->havege_raw & H_DEBUG_TEST_IN)) {
    return 1;
    }
 #endif
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+
 loop_enter:
 LOOP(40,39)
    #include "oneiteration.h"
@@ -417,6 +421,8 @@ LOOP(1,0)
    #include "oneiteration.h"
 LOOP(0,0)
    (void)havege_cp(h_ctxt, i,0,LOOP_PT(0));
+#pragma GCC diagnostic pop
+
 loop_exit:
    return ANDPT==0? 0 : 1;
 }

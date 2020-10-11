@@ -334,7 +334,7 @@ ssize_t safein(                    /* RETURN: read bytes                    */
             break;
          error_exit("Unable to read from socket: %d", socket_fd);
          }
-      ptr += p;
+      ptr = (char *) ptr + p;
       ret += p;
       len -= p;
       }
@@ -363,7 +363,7 @@ void safeout(                      /* RETURN: nothing                       */
                      break;
          error_exit("Unable to write to socket: %d", fd);
          }
-       ptr += p;
+       ptr = (char *) ptr + p;
        len -= p;
        }
    while (len > 0);

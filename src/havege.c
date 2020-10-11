@@ -180,6 +180,8 @@ H_PTR havege_create(             /* RETURN: app state    */
    return h;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void havege_reparent(
   H_PTR hptr)
 {
@@ -191,6 +193,7 @@ void havege_reparent(
    t->main = getpid();
 #endif
 }
+#pragma GCC diagnostic pop
 
 /**
  * Destructor. In a multi-collector build, this method should be called from a signal handler
@@ -253,7 +256,7 @@ int havege_rng(            /* RETURN: number words read     */
       buffer[i] = havege_ndread((H_COLLECT *)h->collector);
    h->error = ((H_COLLECT *)h->collector)->havege_err;
 #endif
-   return h->error==(H_UINT)H_NOERR? sz : -1;
+   return h->error==(H_UINT)H_NOERR? (int) sz : -1;
 }
 /**
  * Start the entropy collector.
@@ -420,12 +423,16 @@ const char *havege_version(const char *version)
 /**
  * Place holder if output display not provided
  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 static void havege_mute(   /* RETURN: none            */
    const char *format,     /* IN: printf format       */
    ...)                    /* IN: args                */
 {
    ;
 }
+#pragma GCC diagnostic pop
+
 #if NUMBER_CORES > 1
 /**
  * Cleanup collector(s). In a multi-collector environment, need to kill

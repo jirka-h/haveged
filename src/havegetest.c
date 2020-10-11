@@ -167,6 +167,8 @@ static int testsDiscard(   /* RETURN: non-zero to discard   */
 /**
  * Place holder for when report is not configured
  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 static void testsMute(
    H_COLLECT * h_ctxt,     /* IN-OUT: collector context     */
    H_UINT action,          /* IN: A_RUN or B_RUN            */
@@ -176,6 +178,7 @@ static void testsMute(
 {
    ;
 }
+#pragma GCC diagnostic pop
 /**
  * The public wrapper that runs the tests. On the first call, the necessary machinery is built.
  * The calls to aisTest() actually run the tests. The test shared structure is read only in this
@@ -581,7 +584,7 @@ static H_UINT aisTest(     /* RETURN: nz if input needed    */
  * helpers are used to implement a high performance copyBit().
  */
 #define COPY_BYTE()           {c = (*src<<bit_diff_ls)|(*(src+1)>>bit_diff_rs);src++;}
-#define COPY_FIRST()          if (xfr >= (8 - dst_bits)) {\
+#define COPY_FIRST()          if ( (int) xfr >= (8 - dst_bits)) {\
                                  *dst &= rm[dst_bits];\
                                  xfr -= 8 - dst_bits;\
                                  }\
@@ -829,7 +832,7 @@ static H_UINT test5(       /* RETURN: updated bit offset    */
     * This test always uses the same data as test1 through test4
     */
    for (max = k = 0,tau=1;tau<=TEST5_LENGTH;tau++){
-      Z_tau = abs(test5XOR(dp, tau) - 2500);
+      Z_tau = abs( (int) test5XOR(dp, tau) - 2500);
       if (Z_tau > max) {
          max = Z_tau;
          k = tau - 1;
@@ -913,7 +916,7 @@ static H_UINT test6a(      /* RETURN: bit offset      */
                }
             /* align to a word boundary, then shift gears to gobble words */
             while((i+8) < r && (j+8) < AIS_LENGTH) {
-               if (0==((void *)bitstream_src - (void *)p->noise) % sizeof(H_UINT))
+               if (0==((char *)bitstream_src - (char *)p->noise) % sizeof(H_UINT))
                   break;
                SIDEWAYS_ADD(c, *bitstream_src++);
                p->counter[0] += c;
