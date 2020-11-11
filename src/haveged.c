@@ -118,7 +118,7 @@ static void set_watermark(int level);
 static void anchor_info(H_PTR h);
 static int  get_runsize(unsigned int *bufct, unsigned int *bufrem, char *bp);
 static char *ppSize(char *buffer, double sz);
-static void print_msg(const char *format, ...);
+static void error_exit(const char *format, ...);
 
 static void run_app(H_PTR handle, H_UINT bufct, H_UINT bufres);
 static void show_meterInfo(H_UINT id, H_UINT event);
@@ -338,8 +338,9 @@ int main(int argc, char **argv)
       } while (c!=-1);
 #ifndef NO_COMMAND_MODE
    if (params->setup & CMD_MODE) {
-      int ret = 0, len;
-      char *ptr, message[PATH_MAX+5], answer[2], cmd[2];
+      int ret = 0, len, answer;
+      char message[PATH_MAX+5], cmd[2];
+      void * ptr;
       fd_set read_fd;
 
       socket_fd = cmd_connect(params);
@@ -372,8 +373,7 @@ int main(int argc, char **argv)
             ret = -1;
             break;
          }
-      answer[0] = '\0';
-      ptr = &answer[0];
+      ptr = &answer;
       len = sizeof(answer);
 
       FD_ZERO(&read_fd);
@@ -392,10 +392,7 @@ int main(int argc, char **argv)
       close(socket_fd);
       if (ret < 0)
          goto err;
-      if (answer[0] != '\x6')
-         ret = -1;
-      else
-         ret = 0;
+      ret = answer;
    err:
       return ret;
       }
@@ -406,10 +403,10 @@ int main(int argc, char **argv)
       else {
         if (socket_fd == -2) {
 	        fprintf(stderr, "%s: command socket already in use\n", params->daemon);
-	        fprintf(stderr, "%s: please check if there is another instance of haveged running\n", params->daemon);
-	        fprintf(stderr, "%s: disabling command mode for this instance\n", params->daemon);
+	        error_exit("%s: please check if there is another instance of haveged running\n", params->daemon);
         } else {
 	        fprintf(stderr, "%s: can not initialize command socket: %s\n", params->daemon, strerror(errno));
+	        fprintf(stderr, "%s: disabling command mode for this instance\n", params->daemon);
         }
       }
     }
@@ -716,7 +713,7 @@ static void anchor_info(H_PTR h)
 /**
  * Bail....
  */
-void error_exit(           /* RETURN: nothing   */
+static void error_exit(    /* RETURN: nothing   */
    const char *format,     /* IN: msg format    */
    ...)                    /* IN: varadic args  */
 {
@@ -834,7 +831,7 @@ static char *ppSize(       /* RETURN: the formatted size */
 /**
  * Execution notices - to stderr or syslog
  */
-static void print_msg(     /* RETURN: nothing   */
+void print_msg(            /* RETURN: nothing   */
    const char *format,     /* IN: format string */
    ...)                    /* IN: args          */
 {
