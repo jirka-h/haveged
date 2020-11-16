@@ -92,4 +92,9 @@ typedef struct {
   */
 void error_exit(const char *, ...);
 
+/**
+  * Execution notices - to stderr or syslog
+  */
+void print_msg(const char *, ...);
+
 #endif

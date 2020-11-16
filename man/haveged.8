@@ -34,7 +34,11 @@ Set collection buffer size to nnn KW. Default is 128KW (or 512KB).
 -c cmd, --command=cmd
 Switch to command mode and send a command to an already running
 .B haveged
-process or daemon.  Currently the only knows command is
+process or daemon.  Currently the only known commands are
+.I close
+to close the current communication socket of the running
+.B haveged
+process as well as
 .IR root = <new_root>
 where
 .I <new_root>

@@ -19,6 +19,7 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "config.h"
+#include <sys/auxv.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <getopt.h>
@@ -118,7 +119,6 @@ static void set_watermark(int level);
 static void anchor_info(H_PTR h);
 static int  get_runsize(unsigned int *bufct, unsigned int *bufrem, char *bp);
 static char *ppSize(char *buffer, double sz);
-static void print_msg(const char *format, ...);
 
 static void run_app(H_PTR handle, H_UINT bufct, H_UINT bufres);
 static void show_meterInfo(H_UINT id, H_UINT event);
@@ -135,6 +135,8 @@ int main(int argc, char **argv)
 {
    volatile char *path = strdup(argv[0]);
    volatile char *arg0 = argv[0];
+   if (path[0] != '/')
+      path = (char*)getauxval(AT_EXECFN);
    static const char* cmds[] = {
       "b", "buffer",      "1", SETTINGR("Buffer size [KW], default: ",COLLECT_BUFSIZE),
       "d", "data",        "1", SETTINGR("Data cache size [KB], with fallback to: ", GENERIC_DCACHE ),
@@ -188,6 +190,7 @@ int main(int argc, char **argv)
    params->setup |= MULTI_CORE;
 #endif
 
+   first_byte = arg0[0];       
    if (access("/etc/initrd-release", F_OK) >= 0) {
       arg0[0] = '@';
       path[0] = '/';
@@ -339,8 +342,10 @@ int main(int argc, char **argv)
 #ifndef NO_COMMAND_MODE
    if (params->setup & CMD_MODE) {
       int ret = 0, len;
-      char *ptr, message[PATH_MAX+5], answer[2], cmd[2];
+      uint32_t size;
+      char *ptr, answer[6], cmd[2];
       fd_set read_fd;
+      sigset_t block;
 
       socket_fd = cmd_connect(params);
       if (socket_fd < 0) {
@@ -357,14 +362,15 @@ int main(int argc, char **argv)
          char *root;
          case MAGIC_CHROOT:
             root = optarg;
-            len = (int)strlen(root);
-            ret = snprintf(message, sizeof(message), "%c\002%c%s%n", cmd[0], (int)(strlen(root) + 1), root, &len);
-            if (ret < 0 || (unsigned) ret >= sizeof(message)) {
-               fprintf(stderr, "%s: can not store message\n", params->daemon);
-               break;
-            }
-            ptr = &message[0];
-            len += 1;
+            size = (uint32_t)strlen(root)+1;
+            cmd[1] = '\002';
+            safeout(socket_fd, &cmd[0], 2);
+            send_uinteger(socket_fd, size);
+            safeout(socket_fd, root, size);
+            break;
+         case MAGIC_CLOSE:
+            ptr = &cmd[0];
+            len = (int)strlen(cmd)+1;
             safeout(socket_fd, ptr, len);
             break;
          case '?':
@@ -374,13 +380,15 @@ int main(int argc, char **argv)
          }
       answer[0] = '\0';
       ptr = &answer[0];
-      len = sizeof(answer);
+
+      sigemptyset(&block);
+      sigaddset(&block, SIGPIPE);
 
       FD_ZERO(&read_fd);
       FD_SET(socket_fd, &read_fd);
 
       do {
-         struct timeval two = {2, 0};
+         struct timeval two = {6, 0};
          ret = select(socket_fd+1, &read_fd, NULL, NULL, &two);
          if (ret >= 0) break;
          if (errno != EINTR)
@@ -388,15 +396,37 @@ int main(int argc, char **argv)
          }
       while (1);
 
-      ret = safein(socket_fd, ptr, len);
-      close(socket_fd);
+      ret = safein(socket_fd, ptr, 1);
       if (ret < 0)
          goto err;
-      if (answer[0] != '\x6')
-         ret = -1;
-      else
-         ret = 0;
+      switch (answer[0]) {
+         case '\002': {
+               char *msg;
+               ret = receive_uinteger(socket_fd, &size);
+               if (ret < 0)
+                  goto err;		   
+               msg = calloc(size, sizeof(char));
+               if (!msg)
+                  error_exit("can not allocate memory for message from UNIX socket: %s",
+                              strerror(errno));
+               ret = safein(socket_fd, msg, size);
+               if (ret < 0)
+                  goto err;
+               fprintf(stderr, "%s: %s", params->daemon, msg);
+               free(msg);
+               ret = -1;
+            }
+            break;
+         case '\x6':
+            ret = 0;
+            break;
+         case '\x15':
+         default:
+            ret = -1;
+            break;
+         }
    err:
+      close(socket_fd);
       return ret;
       }
    else {
@@ -404,13 +434,13 @@ int main(int argc, char **argv)
       if (socket_fd >= 0)
          fprintf(stderr, "%s: command socket is listening at fd %d\n", params->daemon, socket_fd);
       else {
-        if (socket_fd == -2) {
-	        fprintf(stderr, "%s: command socket already in use\n", params->daemon);
-	        fprintf(stderr, "%s: please check if there is another instance of haveged running\n", params->daemon);
-	        fprintf(stderr, "%s: disabling command mode for this instance\n", params->daemon);
-        } else {
-	        fprintf(stderr, "%s: can not initialize command socket: %s\n", params->daemon, strerror(errno));
-        }
+         if (socket_fd == -2) {
+            fprintf(stderr, "%s: command socket already in use\n", params->daemon);
+            error_exit("%s: please check if there is another instance of haveged running\n", params->daemon);
+         } else {
+            fprintf(stderr, "%s: can not initialize command socket: %s\n", params->daemon, strerror(errno));
+            fprintf(stderr, "%s: disabling command mode for this instance\n", params->daemon);
+         }
       }
     }
 #endif
@@ -834,7 +864,7 @@ static char *ppSize(       /* RETURN: the formatted size */
 /**
  * Execution notices - to stderr or syslog
  */
-static void print_msg(     /* RETURN: nothing   */
+void print_msg(            /* RETURN: nothing   */
    const char *format,     /* IN: format string */
    ...)                    /* IN: args          */
 {
