@@ -88,8 +88,8 @@ typedef struct {
 } H_METER;
 
 /**
- * Execution notices - to stderr or syslog
- */
-void print_msg(const char *, ...);
+  * Bail....
+  */
+void error_exit(const char *, ...);
 
 #endif

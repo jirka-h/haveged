@@ -51,7 +51,7 @@ struct ucred
 
 int socket_fd;
 
-static int new_root(               /* RETURN: status                        */
+static void new_root(              /* RETURN: nothing                       */
    const char *root,               /* IN: path of the new root file system  */
    const volatile char *path,      /* IN: path of the haveged executable    */
    char *const argv[],             /* IN: arguments for the haveged process */
@@ -59,28 +59,35 @@ static int new_root(               /* RETURN: status                        */
 {
    int ret;
 
-   print_msg("%s: restart in new root: %s\n", params->daemon, root);
+   fprintf(stderr, "%s: restart in new root: %s\n", params->daemon, root);
    ret = chdir(root);
    if (ret < 0) {
-         print_msg("%s: can't change to working directory : %s\n", params->daemon, root);
-         return ret;
+      if (errno != ENOENT)
+         error_exit("can't change to working directory : %s", root);
+      else
+         fprintf(stderr, "%s: can't change to working directory : %s\n", params->daemon, root);
       }
    ret = chroot(".");
    if (ret < 0) {
-         print_msg("%s: can't change root directory\n", params->daemon);
-         return ret;
+      if (errno != ENOENT)
+         error_exit("can't change root directory");
+      else
+         fprintf(stderr, "%s: can't change root directory\n", params->daemon);
       }
    ret = chdir("/");
    if (ret < 0) {
-         print_msg("%s: can't change to working directory /\n", params->daemon);
-         return ret;
+      if (errno != ENOENT)
+         error_exit("can't change to working directory /");
+      else
+         fprintf(stderr, "%s: can't change to working directory /\n", params->daemon);
       }
    ret = execv((const char *)path, argv);
    if (ret < 0) {
-         print_msg("%s: can't restart %s\n", params->daemon, path);
-         return ret;
+      if (errno != ENOENT)
+         error_exit("can't restart %s", path);
+      else
+         fprintf(stderr, "%s: can't restart %s\n", params->daemon, path);
       }
-   return 0;
 }
 
 /**
@@ -222,7 +229,7 @@ int socket_handler(                /* RETURN: closed file descriptor        */
 {
    struct ucred cred = {0};
    unsigned char magic[2], *ptr;
-   int enqry;
+   char *enqry;
    char *optarg = NULL;
    socklen_t clen;
    int ret = -1, len;
@@ -242,7 +249,7 @@ int socket_handler(                /* RETURN: closed file descriptor        */
 
       optarg = calloc(alen, sizeof(char));
       if (!optarg)
-          print_msg("can not allocate memory for message from UNIX socket");
+          error_exit("can not allocate memory for message from UNIX socket");
 
       ptr = (unsigned char*)optarg;
       len = alen;
@@ -252,34 +259,36 @@ int socket_handler(                /* RETURN: closed file descriptor        */
    clen = sizeof(struct ucred);
    ret = getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &cred, &clen);
    if (ret < 0) {
-      print_msg("%s: can not get credentials from UNIX socket part1\n", params->daemon);
+      fprintf(stderr, "%s: can not get credentials from UNIX socket part1\n", params->daemon);
       goto out;
       }
    if (clen != sizeof(struct ucred)) {
-      print_msg("%s: can not get credentials from UNIX socket part2\n", params->daemon);
+      fprintf(stderr, "%s: can not get credentials from UNIX socket part2\n", params->daemon);
       goto out;
       }
    if (cred.uid != 0) {
-      enqry = -EPERM;
+      enqry = "\x15";
 
-      ptr = (unsigned char *)&enqry;
-      len = sizeof(enqry);
+      ptr = (unsigned char *)enqry;
+      len = (int)strlen(enqry)+1;
       safeout(fd, ptr, len);
       }
 
    switch (magic[0]) {
       case MAGIC_CHROOT:
+         enqry = "\x6";
 
-         enqry = new_root(optarg, path, argv, params);
-         ptr = (unsigned char *)&enqry;
-         len = sizeof(enqry);
+         ptr = (unsigned char *)enqry;
+         len = (int)strlen(enqry)+1;
          safeout(fd, ptr, len);
+
+         new_root(optarg, path, argv, params);
          break;
       default:
-         enqry = -EINVAL;
+         enqry = "\x15";
 
-         ptr = (unsigned char *)&enqry;
-         len = sizeof(enqry);
+         ptr = (unsigned char *)enqry;
+         len = (int)strlen(enqry)+1;
          safeout(fd, ptr, len);
          break;
       }
@@ -323,7 +332,7 @@ ssize_t safein(                    /* RETURN: read bytes                    */
             continue;
          if (errno == EAGAIN || errno == EWOULDBLOCK)
             break;
-         print_msg("Unable to read from socket: %d", socket_fd);
+         error_exit("Unable to read from socket: %d", socket_fd);
          }
       ptr = (char *) ptr + p;
       ret += p;
@@ -352,7 +361,7 @@ void safeout(                      /* RETURN: nothing                       */
                      continue;
          if (errno == EPIPE || errno == EAGAIN || errno == EWOULDBLOCK)
                      break;
-         print_msg("Unable to write to socket: %d", fd);
+         error_exit("Unable to write to socket: %d", fd);
          }
        ptr = (char *) ptr + p;
        len -= p;
