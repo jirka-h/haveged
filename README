@@ -118,13 +118,14 @@ in-line assembly or compiler intrinsics appropriate to the build target.
 
 Currently supported hosts are:
 
-1. x86
-2. ia64
-3. powerpc
-4. s390
-5. sparc
-6. sparclite
-7. generic
+1. x86 (x86_64 and i686)
+2. aarch64
+3. armv7hl
+4. ppc64le
+5. ia64
+6. powerpc
+7. s390
+
 
 The generic host type is provided for those systems without user level access to
 a high-resolution system timer. In this case, the --enable-clock_gettime option
