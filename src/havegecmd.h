@@ -34,6 +34,12 @@ extern "C" {
 
 #define HAVEGED_SOCKET_PATH      "\0/sys/entropy/haveged"
 #define MAGIC_CHROOT             'R'
+#define MAGIC_CLOSE              'X'
+#define MAGIC_PATH               'P'
+
+#define ASCII_ACK                "\x6"    /* ASCII acknowledge */
+#define ASCII_NAK                "\x15"   /* ASCII negative acknowledge */
+#define ASCII_STX                "\x2"    /* ASCII start of text */
   
 #ifndef SOCK_CLOEXEC
 #define SOCK_CLOEXEC 0
@@ -74,10 +80,21 @@ ssize_t safein(int, void *, size_t);
 void safeout(int, const void *, size_t);
 
 /**
+ * Send outgoing unsigned integer to socket
+ */
+void send_uinteger(int, uint32_t);
+
+/**
+ * Receive incomming unsigned integer from socket
+ */
+int receive_uinteger(int, uint32_t *);
+
+/**
  * Socket file descriptor used for communication
  */
 
 extern int socket_fd;
+extern int first_byte;
 
 #ifdef __cplusplus
 }
