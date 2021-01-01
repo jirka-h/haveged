@@ -1,3 +1,7 @@
+v1.9.14 (Jan 01, 2021)
+* made enttest configurable
+* havegecmd.c - new command added to close the communication socket [Werner Fink]
+
 v1.9.13 (Jun 28, 2020)
 * added support for --version [Jirka Hladky]
 * updated systemd service file [Jirka Hladky]
