@@ -57,7 +57,7 @@
 // {{{ VERSION_TEXT
 static const char* VERSION_TEXT =
   "haveged %s\n\n"
-  "Copyright (C) 2018-2020 Jirka Hladky <hladky.jiri@gmail.com>\n"
+  "Copyright (C) 2018-2021 Jirka Hladky <hladky.jiri@gmail.com>\n"
   "Copyright (C) 2009-2014 Gary Wuertz <gary@issiweb.com>\n"
   "Copyright (C) 2011-2012 BenEleventh Consulting <manolson@beneleventh.com>\n\n"
   "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n"
