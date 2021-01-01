@@ -62,6 +62,11 @@ AC_ARG_ENABLE(nistest,
    AS_HELP_STRING([--enable-nistest=[no/yes]],[Run NIST test suite [default=no]]),
    , enable_nistest="no")
 
+## Make ent self-test configurable
+AC_ARG_ENABLE(enttest,
+   AS_HELP_STRING([--enable-enttest=[no/yes]],[Run ENT test suite [default=yes]]),
+   , enable_enttest="yes")
+
 ## Make self test features configurable
 AC_ARG_ENABLE(olt,
    AS_HELP_STRING([--enable-olt=[yes/no]],[Enable online tests [default=yes]]),
@@ -241,7 +246,7 @@ AM_CONDITIONAL(ENABLE_SYSV, test "$init_type" = "sysv")
 AM_CONDITIONAL(ENABLE_SYSTEMD, test "$init_type" = "systemd")
 AM_CONDITIONAL(ENABLE_SYSTEMD_LOOKUP, test "$enable_initdir" = "?")
 AM_CONDITIONAL(ENABLE_NOINIT, test "$init_type" = "none")
-AM_CONDITIONAL(ENABLE_ENT_TEST, test "yes" = "yes")
+AM_CONDITIONAL(ENABLE_ENT_TEST, test "$enable_enttest" = "yes")
 AM_CONDITIONAL(ENABLE_NIST_TEST, test "$enable_nistest" = "yes")
 
 ## Set hardware dependent define for the build
