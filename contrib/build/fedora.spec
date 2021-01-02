@@ -42,7 +42,7 @@ Headers and shared object symbolic links for the HAVEGE algorithm
 
 %build
 #autoreconf -fiv
-%configure --disable-enttest --enable-nistest
+%configure --disable-enttest --enable-nistest --disable-static
 #SMP build is not working
 #make %{?_smp_mflags}
 make
@@ -60,7 +60,8 @@ chmod 0644 COPYING README ChangeLog AUTHORS
 #Install systemd service file
 sed -e 's:@SBIN_DIR@:%{_sbindir}:g' -i init.d/service.fedora
 install -Dpm 0644 init.d/service.fedora %{buildroot}%{_unitdir}/%{name}.service
-install -Dpm 0755 contrib/SUSE/haveged-dracut.module %{buildroot}/lib/dracut/modules.d/98%{name}/module-setup.sh
+install -Dpm 0755 contrib/SUSE/haveged-dracut.module %{buildroot}/%{_libdir}/dracut/modules.d/98%{name}/module-setup.sh
+install -Dpm 0644 contrib/SUSE/90-haveged.rules %{buildroot}%{_udevrulesdir}/90-%{name}.rules
 
 # We don't ship .la files.
 rm -rf %{buildroot}%{_libdir}/libhavege.*a
@@ -108,6 +109,9 @@ fi
 %{_unitdir}/haveged.service
 %{_libdir}/*so.*
 %{_defaultdocdir}/*
+%{_udevrulesdir}/*-%{name}.rules
+%dir %{_libdir}/dracut/modules.d/98%{name}
+%{_libdir}/dracut/modules.d/98%{name}/*
 
 %files devel
 %{_mandir}/man3/libhavege.3*
@@ -121,6 +125,9 @@ fi
 * Sun Jun 28 2020 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.14-1
  - Update to 1.9.14
  - BZ1835006 - Added dracut module
+ - Start the service as soon as the random device is available with
+   the help of udev, as starting services while starved of entropy
+   is no good.
 
 * Sun Jun 28 2020 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.13-1
  - Update to 1.9.13
