@@ -16,9 +16,11 @@ installkernel() {
 install() {
     inst_multiple -o \
         /usr/sbin/haveged \
-        $systemdsystemunitdir/haveged.service
+        $systemdsystemunitdir/haveged.service \
+        $systemdsystemunitdir/haveged-switch-root.service
     mkdir -p "$initdir/$systemdsystemunitdir/sysinit.target.wants"
     mkdir -p "$initdir/$systemdsystemunitdir/initrd-switch-root.target.wants"
     mkdir -p "$initdir/$systemdsystemunitdir/systemd-journald.service.wants"
     ln_r "$systemdsystemunitdir/haveged.service" "$systemdsystemunitdir/systemd-journald.service.wants/haveged.service"
+    ln_r "$systemdsystemunitdir/haveged-switch-root.service" "$systemdsystemunitdir/initrd-switch-root.target.wants/haveged-switch-root.service"
 }

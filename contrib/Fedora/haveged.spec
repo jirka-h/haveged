@@ -1,3 +1,4 @@
+%define dracutlibdir lib/dracut
 Summary:        A Linux entropy source using the HAVEGE algorithm
 Name:           haveged
 Version:        1.9.14
@@ -8,6 +9,7 @@ Source0:        https://github.com/jirka-h/%{name}/archive/v%{version}/%{name}-%
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
+                  TODO - PATCH - DISABLE SYSLOG
 
 BuildRequires:  gcc
 BuildRequires:  automake coreutils glibc-common systemd-units
@@ -59,8 +61,9 @@ chmod 0644 COPYING README ChangeLog AUTHORS
 
 #Install systemd service file
 sed -e 's:@SBIN_DIR@:%{_sbindir}:g' -i init.d/service.fedora
-install -Dpm 0644 init.d/service.fedora %{buildroot}%{_unitdir}/%{name}.service
-install -Dpm 0755 contrib/Fedora/haveged-dracut.module %{buildroot}/%{_libdir}/dracut/modules.d/98%{name}/module-setup.sh
+install -Dpm 0644 contrib/Fedora/haveged.service %{buildroot}%{_unitdir}/%{name}.service
+install -Dpm 0644 contrib/Fedora/haveged-switch-root.service %{buildroot}%{_unitdir}/%{name}-switch-root.service
+install -Dpm 0755 contrib/Fedora/haveged-dracut.module %{buildroot}/${dracutlibdir}/modules.d/98%{name}/module-setup.sh
 install -Dpm 0644 contrib/Fedora/90-haveged.rules %{buildroot}%{_udevrulesdir}/90-%{name}.rules
 
 # We don't ship .la files.
@@ -71,47 +74,24 @@ cp -p COPYING README ChangeLog AUTHORS contrib/build/havege_sample.c %{buildroot
 
 %post
 /sbin/ldconfig
-%if 0%{?systemd_post:1}
-%systemd_post haveged.service
-%else
-if [ $1 = 1 ]; then
-    # Initial installation
-    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
-fi
-%endif
+%systemd_post %{name}.service %{name}-switch-root.service
 
 %preun
-%if 0%{?systemd_preun:1}
-%systemd_preun haveged.service
-%else
-if [ $1 = 0 ]; then
-    # Package removal, not upgrade
-    /bin/systemctl --no-reload disable haveged.service >/dev/null 2>&1 || :
-    /bin/systemctl stop haveged.service >/dev/null 2>&1 || :
-fi
-%endif
+%systemd_preun %{name}.service %{name}-switch-root.service
 
 %postun
-%if 0%{?systemd_postun_with_restart:1}
-%systemd_postun_with_restart haveged.service
-%else
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ]; then
-    # Package upgrade, not uninstall
-    /bin/systemctl try-restart haveged.service >/dev/null 2>&1 || :
-fi
-%endif
+%systemd_postun_with_restart %{name}.service %{name}-switch-root.service
 /sbin/ldconfig
 
 %files
 %{_mandir}/man8/haveged.8*
 %{_sbindir}/haveged
-%{_unitdir}/haveged.service
+%{_unitdir}/*.service
 %{_libdir}/*so.*
 %{_defaultdocdir}/*
 %{_udevrulesdir}/*-%{name}.rules
-%dir %{_libdir}/dracut/modules.d/98%{name}
-%{_libdir}/dracut/modules.d/98%{name}/*
+%dir %{_prefix}/%{dracutlibdir}/modules.d/98%{name}
+%{_prefix}/%{dracutlibdir}/modules.d/98%{name}/*
 
 %files devel
 %{_mandir}/man3/libhavege.3*
