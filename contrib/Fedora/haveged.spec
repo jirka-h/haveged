@@ -60,8 +60,8 @@ chmod 0644 COPYING README ChangeLog AUTHORS
 #Install systemd service file
 sed -e 's:@SBIN_DIR@:%{_sbindir}:g' -i init.d/service.fedora
 install -Dpm 0644 init.d/service.fedora %{buildroot}%{_unitdir}/%{name}.service
-install -Dpm 0755 contrib/SUSE/haveged-dracut.module %{buildroot}/%{_libdir}/dracut/modules.d/98%{name}/module-setup.sh
-install -Dpm 0644 contrib/SUSE/90-haveged.rules %{buildroot}%{_udevrulesdir}/90-%{name}.rules
+install -Dpm 0755 contrib/Fedora/haveged-dracut.module %{buildroot}/%{_libdir}/dracut/modules.d/98%{name}/module-setup.sh
+install -Dpm 0644 contrib/Fedora/90-haveged.rules %{buildroot}%{_udevrulesdir}/90-%{name}.rules
 
 # We don't ship .la files.
 rm -rf %{buildroot}%{_libdir}/libhavege.*a
