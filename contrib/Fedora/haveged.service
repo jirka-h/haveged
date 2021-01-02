@@ -11,11 +11,12 @@ Restart=always
 SuccessExitStatus=137 143
 
 SecureBits=noroot-locked
-CapabilityBoundingSet=CAP_SYS_ADMIN
+CapabilityBoundingSet=CAP_SYS_ADMIN CAP_SYS_CHROOT
 # We can *not* set PrivateTmp=true as it can cause an ordering cycle.
 PrivateTmp=false
 PrivateDevices=true
-PrivateNetwork=true
+# We can *not* set PrivateNetwork=true to allow command mode (chroot when included in initramfs)
+#PrivateNetwork=true
 ProtectSystem=full
 ProtectHome=true
 ProtectHostname=true
