@@ -59,7 +59,7 @@ make install DESTDIR=%{buildroot} INSTALL="install -p"
 chmod 0644 COPYING README ChangeLog AUTHORS
 
 #Install systemd service file
-sed -e 's:@SBIN_DIR@:%{_sbindir}:g' -i init.d/service.fedora
+sed -e 's:@SBIN_DIR@:%{_sbindir}:g' -i contrib/Fedora/*service
 install -Dpm 0644 contrib/Fedora/haveged.service %{buildroot}%{_unitdir}/%{name}.service
 install -Dpm 0644 contrib/Fedora/haveged-switch-root.service %{buildroot}%{_unitdir}/%{name}-switch-root.service
 install -Dpm 0755 contrib/Fedora/haveged-dracut.module %{buildroot}/%{_prefix}/%{dracutlibdir}/modules.d/98%{name}/module-setup.sh

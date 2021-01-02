@@ -6,7 +6,7 @@ Before=initrd-switch-root.service
 JoinsNamespaceOf=haveged.service
 
 [Service]
-ExecStart=-/usr/sbin/haveged -c root=/sysroot
+ExecStart=-@SBIN_DIR@/haveged -c root=/sysroot
 PrivateNetwork=yes
 Type=oneshot
 StandardInput=null
