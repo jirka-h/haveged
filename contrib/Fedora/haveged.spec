@@ -9,7 +9,6 @@ Source0:        https://github.com/jirka-h/%{name}/archive/v%{version}/%{name}-%
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
-                  TODO - PATCH - DISABLE SYSLOG
 
 BuildRequires:  gcc
 BuildRequires:  automake coreutils glibc-common systemd-units
