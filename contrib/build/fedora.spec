@@ -42,7 +42,7 @@ Headers and shared object symbolic links for the HAVEGE algorithm
 
 %build
 #autoreconf -fiv
-%configure
+%configure --disable-enttest --enable-nistest
 #SMP build is not working
 #make %{?_smp_mflags}
 make
@@ -60,6 +60,7 @@ chmod 0644 COPYING README ChangeLog AUTHORS
 #Install systemd service file
 sed -e 's:@SBIN_DIR@:%{_sbindir}:g' -i init.d/service.fedora
 install -Dpm 0644 init.d/service.fedora %{buildroot}%{_unitdir}/%{name}.service
+install -Dpm 0755 contrib/SUSE/haveged-dracut.module %{buildroot}/lib/dracut/modules.d/98%{name}/module-setup.sh
 
 # We don't ship .la files.
 rm -rf %{buildroot}%{_libdir}/libhavege.*a

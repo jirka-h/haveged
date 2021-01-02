@@ -371,7 +371,7 @@ ssize_t safein(                    /* RETURN: read bytes                    */
    if (ret < 0 || avail <=0)
       goto out;
 
-   if (len > avail)
+   if (len > (unsigned int) avail)
       len = avail; 
 
    do {
