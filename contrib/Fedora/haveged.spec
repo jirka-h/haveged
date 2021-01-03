@@ -12,6 +12,7 @@ Requires(postun): systemd
 
 BuildRequires:  gcc
 BuildRequires:  automake coreutils glibc-common systemd-units
+BuildRequires:  make
 Enhances:       apache2 gpg2 openssl openvpn php5 smtp_daemon systemd
 
 %description
