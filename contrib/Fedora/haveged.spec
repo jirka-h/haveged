@@ -102,7 +102,7 @@ cp -p COPYING README ChangeLog AUTHORS contrib/build/havege_sample.c %{buildroot
 
 
 %changelog
-* Sun Jun 28 2020 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.14-1
+* Sun Jan 3 2021 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.14-1
  - Update to 1.9.14
  - BZ1835006 - Added dracut module
  - Start the service as soon as the random device is available with
