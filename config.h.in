@@ -33,6 +33,9 @@
 /* Define to 1 if you have the `floor' function. */
 #undef HAVE_FLOOR
 
+/* Define to 1 if you have the `getauxval' function. */
+#undef HAVE_GETAUXVAL
+
 /* Define to 1 if you have the `getsockopt' function. */
 #undef HAVE_GETSOCKOPT
 
@@ -137,6 +140,9 @@
 
 /* Define to 1 if you have the <syslog.h> header file. */
 #undef HAVE_SYSLOG_H
+
+/* Define to 1 if you have the <sys/auxv.h> header file. */
+#undef HAVE_SYS_AUXV_H
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H
