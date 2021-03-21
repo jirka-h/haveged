@@ -110,7 +110,7 @@ AC_HEADER_TIME
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_SELECT_ARGTYPES
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([__rdtsc accept accept4 bind connect execv floor getsockopt gettimeofday listen memset pow pselect recv sched_yield select send setsockopt socket sqrt])
+AC_CHECK_FUNCS([__rdtsc accept accept4 bind connect execv floor getauxval getsockopt gettimeofday listen memset pow pselect recv sched_yield select send setsockopt socket sqrt])
 
 ## Checks for header files.
 AC_HEADER_STDC
@@ -124,6 +124,7 @@ AC_CHECK_HEADERS(stdint.h)
 AC_CHECK_HEADERS(stdio.h)
 AC_CHECK_HEADERS(stdlib.h)
 AC_CHECK_HEADERS(string.h)
+AC_CHECK_HEADERS([sys/auxv.h])
 AC_CHECK_HEADERS(sys/ioctl.h)
 AC_CHECK_HEADERS(sys/auxv.h)
 AC_CHECK_HEADERS(sys/mman.h)
