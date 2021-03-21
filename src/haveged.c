@@ -19,7 +19,9 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "config.h"
+#if defined(HAVE_SYS_AUXV_H)
 #include <sys/auxv.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <getopt.h>
@@ -135,8 +137,10 @@ int main(int argc, char **argv)
 {
    volatile char *path = strdup(argv[0]);
    volatile char *arg0 = argv[0];
+#if defined(HAVE_SYS_AUXV_H)
    if (path[0] != '/')
       path = (char*)getauxval(AT_EXECFN);
+#endif
    static const char* cmds[] = {
       "b", "buffer",      "1", SETTINGR("Buffer size [KW], default: ",COLLECT_BUFSIZE),
       "d", "data",        "1", SETTINGR("Data cache size [KB], with fallback to: ", GENERIC_DCACHE ),
