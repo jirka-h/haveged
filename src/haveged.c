@@ -19,7 +19,7 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "config.h"
-#ifdef HAVE_SYS_AUXV_H
+#if defined(HAVE_SYS_AUXV_H)
 #include <sys/auxv.h>
 #endif
 #include <stdlib.h>
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 {
    volatile char *path = strdup(argv[0]);
    volatile char *arg0 = argv[0];
-#ifdef HAVE_GETAUXVAL
+#if defined(HAVE_SYS_AUXV_H)
    if (path[0] != '/')
       path = (char*)getauxval(AT_EXECFN);
 #endif
