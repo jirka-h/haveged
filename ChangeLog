@@ -1,3 +1,8 @@
+v1.9.15 (TBD)
+* Check for sys/auxv.h before using it. [Peter Seiderer]
+* fix build on uclibc (origin/pr/58) [Pierre-Jean Texier]
+* Improved make check tests [Jirka Hladky]
+
 v1.9.14 (Jan 01, 2021)
 * made enttest configurable
 * havegecmd.c - new command added to close the communication socket [Werner Fink]
