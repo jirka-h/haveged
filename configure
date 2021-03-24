@@ -12776,7 +12776,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-for ac_func in __rdtsc accept accept4 bind connect execv floor getsockopt gettimeofday listen memset pow pselect recv sched_yield select send setsockopt socket sqrt
+for ac_func in __rdtsc accept accept4 bind connect execv floor getauxval getsockopt gettimeofday listen memset pow pselect recv sched_yield select send setsockopt socket sqrt
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
@@ -13022,12 +13022,36 @@ fi
 
 done
 
+for ac_header in sys/auxv.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "sys/auxv.h" "ac_cv_header_sys_auxv_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_auxv_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SYS_AUXV_H 1
+_ACEOF
+
+fi
+
+done
+
 for ac_header in sys/ioctl.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "sys/ioctl.h" "ac_cv_header_sys_ioctl_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_ioctl_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_SYS_IOCTL_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in sys/auxv.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "sys/auxv.h" "ac_cv_header_sys_auxv_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_auxv_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SYS_AUXV_H 1
 _ACEOF
 
 fi

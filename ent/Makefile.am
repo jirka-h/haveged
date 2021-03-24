@@ -10,13 +10,14 @@ entest_LDADD = -lm
 
 entest_SOURCES = entest.c iso8859.c randtest.c chisq.c iso8859.h randtest.h 
 
-CLEANFILES = sample
+CLEANFILES = sample *log
+clean-local:
+	rm -rf chi_square
 
 MAINTAINERCLEANFILES = Makefile.in
 
 if ENABLE_ENT_TEST
 check-local:
 	./entest -t ${srcdir}/entitle.gif
-	../src/haveged -n 16384k -v 1 $*
-	./entest -vf sample
+	./test.sh
 endif
