@@ -194,7 +194,9 @@ int main(int argc, char **argv)
    params->setup |= MULTI_CORE;
 #endif
 
-   first_byte = arg0[0];       
+#ifndef NO_COMMAND_MODE
+   first_byte = arg0[0];
+#endif
    if (access("/etc/initrd-release", F_OK) >= 0) {
       arg0[0] = '@';
       path[0] = '/';
