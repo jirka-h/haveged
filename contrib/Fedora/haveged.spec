@@ -11,8 +11,7 @@ Requires(preun):  systemd
 Requires(postun): systemd
 
 BuildRequires:  gcc
-BuildRequires:  automake coreutils glibc-common systemd-units
-BuildRequires:  make
+BuildRequires:  make automake coreutils glibc-common systemd-units
 Enhances:       apache2 gpg2 openssl openvpn php5 smtp_daemon systemd
 
 %description
@@ -104,6 +103,16 @@ cp -p COPYING README ChangeLog AUTHORS contrib/build/havege_sample.c %{buildroot
 %changelog
 * Thu Sep 30 2021 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.15-1
  - Update to 1.9.15
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.14-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 1.9.14-4
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Sun Jan 3 2021 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.14-2
  - Update to 1.9.14

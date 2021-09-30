@@ -1,4 +1,6 @@
-v1.9.15 (TBD)
+v1.9.16 (TBD)
+
+v1.9.15 (Sep 30, 2021)
 * Check for sys/auxv.h before using it. [Peter Seiderer]
 * fix build on uclibc (origin/pr/58) [Pierre-Jean Texier]
 * Improved make check tests [Jirka Hladky]
