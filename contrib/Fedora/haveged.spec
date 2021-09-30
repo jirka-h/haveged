@@ -1,7 +1,7 @@
 %define dracutlibdir lib/dracut
 Summary:        A Linux entropy source using the HAVEGE algorithm
 Name:           haveged
-Version:        1.9.14
+Version:        1.9.15
 Release:        1%{?dist}
 License:        GPLv3+
 URL:            https://github.com/jirka-h/haveged
@@ -22,7 +22,7 @@ Haveged is a user space entropy daemon which is not dependent upon the
 standard mechanisms for harvesting randomness for the system entropy
 pool. This is important in systems with high entropy needs or limited
 user interaction (e.g. headless servers).
- 
+
 Haveged uses HAVEGE (HArdware Volatile Entropy Gathering and Expansion)
 to maintain a 1M pool of random bytes used to fill /dev/random
 whenever the supply of random bits in /dev/random falls below the low
@@ -102,7 +102,10 @@ cp -p COPYING README ChangeLog AUTHORS contrib/build/havege_sample.c %{buildroot
 
 
 %changelog
-* Sun Jan 3 2021 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.14-1
+* Thu Sep 30 2021 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.15-1
+ - Update to 1.9.15
+
+* Sun Jan 3 2021 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.14-2
  - Update to 1.9.14
  - BZ1835006 - Added dracut module
  - Start the service as soon as the random device is available with
