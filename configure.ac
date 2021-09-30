@@ -49,14 +49,6 @@ elif test "x$enable_diagnostic" = "xinject"; then
    enable_daemon="no";
 fi
 
-## Make init configurable
-AC_ARG_ENABLE(init,
-   AS_HELP_STRING([--enable-init=[type]],[Enable service.* or sysv.* template [default=no]]),
-   , enable_init="no" )
-AC_ARG_ENABLE(initdir,
-   AS_HELP_STRING([--enable-initdir=DIR], [Directory for systemd service files [default=pkg-config var if init==service.*]]),
-   , enable_initdir="?")
-
 ## Make nist self-test configurable
 AC_ARG_ENABLE(nistest,
    AS_HELP_STRING([--enable-nistest=[no/yes]],[Run NIST test suite [default=no]]),
@@ -220,34 +212,9 @@ if test "x$enable_clock_gettime" = "xyes"; then
 fi
 
 
-## Determine init type
-
-if test "$daemon_type" = "none"; then
-    AC_DEFINE(NO_DAEMON, 1, [Define to 1 to suppress daemon interface])
-      init_type="none"
-else
-  case "$enable_init" in
-    service.*)
-       init_type="systemd"
-     ;;
-    sysv.*)
-       init_type="sysv"
-     ;;
-    *)
-       init_type="none"
-     ;;
-esac
-fi
-
 ## Fixup install and test options
 
-AC_SUBST(HA_DISTRO,$enable_init)
-AC_SUBST(HA_UNITD,$enable_initdir)
 AM_CONDITIONAL(ENABLE_BIN, test "$daemon_type" = "none")
-AM_CONDITIONAL(ENABLE_SYSV, test "$init_type" = "sysv")
-AM_CONDITIONAL(ENABLE_SYSTEMD, test "$init_type" = "systemd")
-AM_CONDITIONAL(ENABLE_SYSTEMD_LOOKUP, test "$enable_initdir" = "?")
-AM_CONDITIONAL(ENABLE_NOINIT, test "$init_type" = "none")
 AM_CONDITIONAL(ENABLE_ENT_TEST, test "$enable_enttest" = "yes")
 AM_CONDITIONAL(ENABLE_NIST_TEST, test "$enable_nistest" = "yes")
 
@@ -258,7 +225,6 @@ AC_SUBST(HA_LDFLAGS)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  man/Makefile
-                 init.d/Makefile
                  ent/Makefile
                  nist/Makefile])
 AC_OUTPUT

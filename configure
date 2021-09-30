@@ -638,18 +638,8 @@ ENABLE_NIST_TEST_FALSE
 ENABLE_NIST_TEST_TRUE
 ENABLE_ENT_TEST_FALSE
 ENABLE_ENT_TEST_TRUE
-ENABLE_NOINIT_FALSE
-ENABLE_NOINIT_TRUE
-ENABLE_SYSTEMD_LOOKUP_FALSE
-ENABLE_SYSTEMD_LOOKUP_TRUE
-ENABLE_SYSTEMD_FALSE
-ENABLE_SYSTEMD_TRUE
-ENABLE_SYSV_FALSE
-ENABLE_SYSV_TRUE
 ENABLE_BIN_FALSE
 ENABLE_BIN_TRUE
-HA_UNITD
-HA_DISTRO
 HAVEGE_LT_VERSION
 LT_SYS_LIBRARY_PATH
 OTOOL64
@@ -769,8 +759,6 @@ enable_libtool_lock
 enable_clock_gettime
 enable_daemon
 enable_diagnostic
-enable_init
-enable_initdir
 enable_nistest
 enable_enttest
 enable_olt
@@ -1417,9 +1405,6 @@ Optional Features:
   --enable-daemon=yes/no  Enable daemon [default=yes if linux]
   --enable-diagnostic=no/capture/inject/yes
                           Enable diagnostic mode [default=no]
-  --enable-init=type      Enable service.* or sysv.* template [default=no]
-  --enable-initdir=DIR    Directory for systemd service files
-                          [default=pkg-config var if init==service.*]
   --enable-nistest=no/yes Run NIST test suite [default=no]
   --enable-enttest=no/yes Run ENT test suite [default=yes]
   --enable-olt=yes/no     Enable online tests [default=yes]
@@ -12007,22 +11992,6 @@ $as_echo "#define RAW_IN_ENABLE 1" >>confdefs.h
    enable_daemon="no";
 fi
 
-## Make init configurable
-# Check whether --enable-init was given.
-if test "${enable_init+set}" = set; then :
-  enableval=$enable_init;
-else
-  enable_init="no"
-fi
-
-# Check whether --enable-initdir was given.
-if test "${enable_initdir+set}" = set; then :
-  enableval=$enable_initdir;
-else
-  enable_initdir="?"
-fi
-
-
 ## Make nist self-test configurable
 # Check whether --enable-nistest was given.
 if test "${enable_nistest+set}" = set; then :
@@ -13374,32 +13343,7 @@ $as_echo "#define ENABLE_CLOCK_GETTIME 1" >>confdefs.h
 fi
 
 
-## Determine init type
-
-if test "$daemon_type" = "none"; then
-
-$as_echo "#define NO_DAEMON 1" >>confdefs.h
-
-      init_type="none"
-else
-  case "$enable_init" in
-    service.*)
-       init_type="systemd"
-     ;;
-    sysv.*)
-       init_type="sysv"
-     ;;
-    *)
-       init_type="none"
-     ;;
-esac
-fi
-
 ## Fixup install and test options
-
-HA_DISTRO=$enable_init
-
-HA_UNITD=$enable_initdir
 
  if test "$daemon_type" = "none"; then
   ENABLE_BIN_TRUE=
@@ -13407,38 +13351,6 @@ HA_UNITD=$enable_initdir
 else
   ENABLE_BIN_TRUE='#'
   ENABLE_BIN_FALSE=
-fi
-
- if test "$init_type" = "sysv"; then
-  ENABLE_SYSV_TRUE=
-  ENABLE_SYSV_FALSE='#'
-else
-  ENABLE_SYSV_TRUE='#'
-  ENABLE_SYSV_FALSE=
-fi
-
- if test "$init_type" = "systemd"; then
-  ENABLE_SYSTEMD_TRUE=
-  ENABLE_SYSTEMD_FALSE='#'
-else
-  ENABLE_SYSTEMD_TRUE='#'
-  ENABLE_SYSTEMD_FALSE=
-fi
-
- if test "$enable_initdir" = "?"; then
-  ENABLE_SYSTEMD_LOOKUP_TRUE=
-  ENABLE_SYSTEMD_LOOKUP_FALSE='#'
-else
-  ENABLE_SYSTEMD_LOOKUP_TRUE='#'
-  ENABLE_SYSTEMD_LOOKUP_FALSE=
-fi
-
- if test "$init_type" = "none"; then
-  ENABLE_NOINIT_TRUE=
-  ENABLE_NOINIT_FALSE='#'
-else
-  ENABLE_NOINIT_TRUE='#'
-  ENABLE_NOINIT_FALSE=
 fi
 
  if test "$enable_enttest" = "yes"; then
@@ -13462,7 +13374,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile man/Makefile init.d/Makefile ent/Makefile nist/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile man/Makefile ent/Makefile nist/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13591,22 +13503,6 @@ fi
 
 if test -z "${ENABLE_BIN_TRUE}" && test -z "${ENABLE_BIN_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_BIN\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${ENABLE_SYSV_TRUE}" && test -z "${ENABLE_SYSV_FALSE}"; then
-  as_fn_error $? "conditional \"ENABLE_SYSV\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${ENABLE_SYSTEMD_TRUE}" && test -z "${ENABLE_SYSTEMD_FALSE}"; then
-  as_fn_error $? "conditional \"ENABLE_SYSTEMD\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${ENABLE_SYSTEMD_LOOKUP_TRUE}" && test -z "${ENABLE_SYSTEMD_LOOKUP_FALSE}"; then
-  as_fn_error $? "conditional \"ENABLE_SYSTEMD_LOOKUP\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${ENABLE_NOINIT_TRUE}" && test -z "${ENABLE_NOINIT_FALSE}"; then
-  as_fn_error $? "conditional \"ENABLE_NOINIT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_ENT_TEST_TRUE}" && test -z "${ENABLE_ENT_TEST_FALSE}"; then
@@ -14496,7 +14392,6 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "man/Makefile") CONFIG_FILES="$CONFIG_FILES man/Makefile" ;;
-    "init.d/Makefile") CONFIG_FILES="$CONFIG_FILES init.d/Makefile" ;;
     "ent/Makefile") CONFIG_FILES="$CONFIG_FILES ent/Makefile" ;;
     "nist/Makefile") CONFIG_FILES="$CONFIG_FILES nist/Makefile" ;;
 
