@@ -110,7 +110,7 @@ static H_PTR handle = NULL;
  * Local prototypes
  */
 #ifndef NO_DAEMON
-static H_UINT poolSize = 0;
+static int poolSize = 0;
 
 static void daemonize(void);
 static int  get_poolsize(void);
@@ -692,7 +692,7 @@ static void run_daemon(    /* RETURN: nothing   */
          if (conn_fd >= 0)
             continue;
          }
-  
+
       if (conn_fd >= 0 && FD_ISSET(conn_fd, &read_fd))
          conn_fd = socket_handler(conn_fd, path, argv, params);
 #endif
@@ -723,7 +723,7 @@ static void set_watermark( /* RETURN: nothing   */
 {
    FILE *wm_fh;
 
-   if ( (H_UINT) level > (poolSize - 32))
+   if ( level > (poolSize - 32))
       level = poolSize - 32;
    wm_fh = fopen(params->watermark, "w");
    if (wm_fh) {
@@ -744,7 +744,7 @@ static void anchor_info(H_PTR h)
    char       buf[120];
    H_SD_TOPIC topics[4] = {H_SD_TOPIC_BUILD, H_SD_TOPIC_TUNE, H_SD_TOPIC_TEST, H_SD_TOPIC_SUM};
    int        i;
-   
+
    for(i=0;i<4;i++)
       if (havege_status_dump(h, topics[i], buf, sizeof(buf))>0)
          print_msg("%s\n", buf);
