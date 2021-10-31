@@ -29,7 +29,7 @@ RestrictRealtime=true
 LockPersonality=true
 MemoryDenyWriteExecute=true
 SystemCallArchitectures=native
-SystemCallFilter=@system-service
+SystemCallFilter=@system-service newuname
 SystemCallFilter=~@mount
 SystemCallErrorNumber=EPERM
 
