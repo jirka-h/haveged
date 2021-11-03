@@ -188,7 +188,7 @@ If running as a daemon, access to the following files is required
 .I /proc/sys/kernel/osrelease
 .P
 .I /proc/sys/kernel/random/poolsize
-.P    
+.P
 .I /proc/sys/kernel/random/write_wakeup_threshold
 .RE
 
@@ -313,6 +313,9 @@ haveged -n 16T -o tba8cbw -f - | pv > /dev/null
 .TP
 Generate large amounts of data (16TB). Disable continuous tests for the maximum throughput but run the online tests at the startup to make sure that generator for properly initialized:
 haveged -n 16T -o tba8c -f - | pv > /dev/null
+.TP
+Create a password equivalent to a key strength of 256 bit
+haveged -f - -n 32 2>/dev/null | base64 | tr -d =
 
 .SH SEE ALSO
 .TP

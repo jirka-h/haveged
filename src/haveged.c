@@ -435,7 +435,7 @@ int main(int argc, char **argv)
       close(socket_fd);
       return ret;
       }
-   else {
+   else if (!(params->setup & RUN_AS_APP)){
       socket_fd = cmd_listen(params);
       if (socket_fd >= 0)
          fprintf(stderr, "%s: command socket is listening at fd %d\n", params->daemon, socket_fd);
