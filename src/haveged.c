@@ -33,6 +33,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <time.h>
 
 #ifndef NO_DAEMON
 #include <syslog.h>
@@ -592,6 +593,7 @@ static void run_daemon(    /* RETURN: nothing   */
 #endif
    struct rand_pool_info   *output;
    struct stat stat_buf;
+   time_t t[2];
 
    if (0 != params->run_level) {
       anchor_info(h);
@@ -623,6 +625,9 @@ static void run_daemon(    /* RETURN: nothing   */
 #else
    sigprocmask(SIG_BLOCK, &mask, &omask);
 #endif
+
+
+   t[0] = 0;
    for(;;) {
       int current,nbytes,r,max=0;
       fd_set write_fd;
@@ -632,6 +637,23 @@ static void run_daemon(    /* RETURN: nothing   */
 
       if (params->exit_code > 128)
          error_exit("Stopping due to signal %d\n", params->exit_code - 128);
+
+      t[1] = time(NULL);
+      if (t[1] - t[0] > 60) {
+        /* add entropy on daemon start unconditionally */
+        nbytes = poolSize / 2;
+        r = (nbytes+sizeof(H_UINT)-1)/sizeof(H_UINT);
+        if (havege_rng(h, (H_UINT *)output->buf, r)<1)
+          error_exit("RNG failed! %d", h->error);
+        output->buf_size = nbytes;
+        /* entropy is 8 bits per byte */
+        output->entropy_count = nbytes * 8;
+        if (ioctl(random_fd, RNDADDENTROPY, output) == -1)
+          printf("RNDADDENTROPY failed!");
+        printf("Added %d bytes of entropy\n", nbytes);
+        t[0] = t[1];
+        continue;
+      }
 
       FD_ZERO(&write_fd);
 #ifndef NO_COMMAND_MODE
@@ -652,7 +674,7 @@ static void run_daemon(    /* RETURN: nothing   */
            if (conn_fd > max)
               max = conn_fd;
            }
-       } 
+       }
 #endif
       for(;;)  {
          struct timespec two = {2, 0};
@@ -711,6 +733,7 @@ static void run_daemon(    /* RETURN: nothing   */
       output->buf_size = nbytes;
       /* entropy is 8 bits per byte */
       output->entropy_count = nbytes * 8;
+      t[0] = t[1];
       if (ioctl(random_fd, RNDADDENTROPY, output) == -1)
          error_exit("RNDADDENTROPY failed!");
       }
