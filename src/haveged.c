@@ -649,8 +649,7 @@ static void run_daemon(    /* RETURN: nothing   */
         /* entropy is 8 bits per byte */
         output->entropy_count = nbytes * 8;
         if (ioctl(random_fd, RNDADDENTROPY, output) == -1)
-          printf("RNDADDENTROPY failed!");
-        printf("Added %d bytes of entropy\n", nbytes);
+          printf("Warning: RNDADDENTROPY failed!");
         t[0] = t[1];
         continue;
       }
@@ -936,7 +935,7 @@ static void run_app(       /* RETURN: nothing         */
 #ifdef RAW_IN_ENABLE
    {
       char *format, *in="",*out,*sz,*src="";
-      
+
       if (params->run_level==DIAG_RUN_INJECT)
          in = "tics";
       else if (params->run_level==DIAG_RUN_TEST)
@@ -951,7 +950,7 @@ static void run_app(       /* RETURN: nothing         */
       else sz = "unlimited";
       out = (fout==stdout)? "stdout" : params->sample_out;
       fprintf(stderr, format, in, src, sz, out);
-   }  
+   }
 #else
    if (limits)
       fprintf(stderr, "Writing %s output to %s\n",
