@@ -1,7 +1,7 @@
 /**
  ** Simple entropy harvester based upon the havege RNG
  **
- ** Copyright 2018-2021 Jirka Hladky hladky DOT jiri AT gmail DOT com
+ ** Copyright 2018-2022 Jirka Hladky hladky DOT jiri AT gmail DOT com
  ** Copyright 2009-2014 Gary Wuertz gary@issiweb.com
  ** Copyright 2011-2012 BenEleventh Consulting manolson@beneleventh.com
  **
@@ -60,7 +60,7 @@
 // {{{ VERSION_TEXT
 static const char* VERSION_TEXT =
   "haveged %s\n\n"
-  "Copyright (C) 2018-2021 Jirka Hladky <hladky.jiri@gmail.com>\n"
+  "Copyright (C) 2018-2022 Jirka Hladky <hladky.jiri@gmail.com>\n"
   "Copyright (C) 2009-2014 Gary Wuertz <gary@issiweb.com>\n"
   "Copyright (C) 2011-2012 BenEleventh Consulting <manolson@beneleventh.com>\n\n"
   "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n"
@@ -655,9 +655,10 @@ static void run_daemon(    /* RETURN: nothing   */
         /* entropy is 8 bits per byte */
         output->entropy_count = nbytes * 8;
         if (ioctl(random_fd, RNDADDENTROPY, output) == -1)
-          printf("Warning: RNDADDENTROPY failed!");
+          error_exit("RNDADDENTROPY failed!");
+        h->n_entropy_bytes += nbytes;
         if (params->once == 1)
-          return;
+          error_exit("Entropy refilled once (%d bytes), exiting.", nbytes);
         t[0] = t[1];
         continue;
       }
@@ -743,6 +744,7 @@ static void run_daemon(    /* RETURN: nothing   */
       t[0] = t[1];
       if (ioctl(random_fd, RNDADDENTROPY, output) == -1)
          error_exit("RNDADDENTROPY failed!");
+      h->n_entropy_bytes += nbytes;
       }
 }
 /**
@@ -801,7 +803,7 @@ void error_exit(           /* RETURN: nothing   */
 #endif
    {
    fprintf(stderr, "%s: %s\n", params->daemon, buffer);
-   if (0 !=(params->setup & RUN_AS_APP) && 0 != handle) {
+   if (0 !=(params->setup & (RUN_AS_APP | RUN_IN_FG) ) && 0 != handle) {
       if (havege_status_dump(handle, H_SD_TOPIC_TEST, buffer, sizeof(buffer))>0)
          fprintf(stderr, "%s\n", buffer);
       if (havege_status_dump(handle, H_SD_TOPIC_SUM, buffer, sizeof(buffer))>0)
@@ -824,7 +826,7 @@ static int get_runsize(    /* RETURN: the size        */
    int         p2 = 0;
    int         p10 = APP_BUFF_SIZE * sizeof(H_UINT);
    long long   ct;
-   
+
 
    f = strtod(bp, &suffix);
    if (f < 0 || strlen(suffix)>1)
@@ -888,7 +890,7 @@ static char *ppSize(       /* RETURN: the formatted size */
    char   units[] = {'T', 'G', 'M', 'K', 0};
    double factor  = 1024.0 * 1024.0 * 1024.0 * 1024.0;
    int i;
-   
+
    for (i=0;0 != units[i];i++) {
       if (sz >= factor)
          break;

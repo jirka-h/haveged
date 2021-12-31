@@ -1,7 +1,7 @@
 /**
  ** Simple entropy harvester based upon the havege RNG
  **
- ** Copyright 2018-2021 Jirka Hladky hladky DOT jiri AT gmail DOT com
+ ** Copyright 2018-2022 Jirka Hladky hladky DOT jiri AT gmail DOT com
  ** Copyright 2009-2014 Gary Wuertz gary@issiweb.com
  ** Copyright 2011-2012 BenEleventh Consulting manolson@beneleventh.com
  **
@@ -56,7 +56,7 @@ typedef void (*pMsg)(const char *format, ...);
 typedef int (*pRawIn)(volatile H_UINT *pData, H_UINT szData);
 /**
  * options for H_PARAMS below. Lower byte transferred from verbose settings
- * upper byte set by diagnositic run options 
+ * upper byte set by diagnositic run options
  */
 #define H_VERBOSE         0x001           /* deprecated from ver 1.7       */
 #define H_DEBUG_INFO      0x001           /* Show config info, retries     */
@@ -72,7 +72,7 @@ typedef int (*pRawIn)(volatile H_UINT *pData, H_UINT szData);
 /**
  * Initialization parameters. Use non-zero values to override default values.
  * Notes:
- * 
+ *
  * 1) Correspondence between provided value and value of H_PTR members are:
  *    ioSz <==> i_readSz, collectSize <==> i_collectSz, nCores <==> n_cores,
  *    options <==> havege_opts
@@ -159,6 +159,7 @@ typedef struct h_anchor {
    H_UINT      m_sz;                      /* size of thread ipc area (bytes)  */
    H_UINT      n_cores;                   /* number of cores                  */
    H_UINT      n_fills;                   /* number of buffer fills           */
+   size_t      n_entropy_bytes;           /* total amount of entropy (byte)   */
 } *H_PTR;
 /**
  * Fail/Success counters for tot and production tests.
