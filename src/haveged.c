@@ -79,6 +79,7 @@ static struct pparams defaults = {
   .buffersz       = 0,
   .detached       = 0,
   .foreground     = 0,
+  .once           = 0,
   .d_cache        = 0,
   .i_cache        = 0,
   .run_level      = 0,
@@ -151,6 +152,7 @@ int main(int argc, char **argv)
       "i", "inst",        "1", SETTINGR("Instruction cache size [KB], with fallback to: ", GENERIC_ICACHE),
       "f", "file",        "1", "Sample output file,  default: '" OUTPUT_DEFAULT "', '-' for stdout",
       "F", "Foreground",  "0", "Run daemon in foreground",
+      "e", "once",        "0", "Provide entropy to the kernel once and quit immediatelly",
       "r", "run",         "1", "0=daemon, 1=config info, >1=<r>KB sample",
       "n", "number",      "1", "Output size in [k|m|g|t] bytes, 0 = unlimited to stdout",
       "o", "onlinetest",  "1", "[t<x>][c<x>] x=[a[n][w]][b[w]] 't'ot, 'c'ontinuous, default: ta8b",
@@ -279,6 +281,10 @@ int main(int argc, char **argv)
          case 'F':
             params->setup |= RUN_IN_FG;
             params->foreground = 1;
+            break;
+         case 'e':
+            params->setup |= RUN_ONCE;
+            params->once = 1;
             break;
          case 'b':
             params->buffersz = ATOU(optarg) * 1024;
@@ -640,7 +646,7 @@ static void run_daemon(    /* RETURN: nothing   */
 
       t[1] = time(NULL);
       if (t[1] - t[0] > 60) {
-        /* add entropy on daemon start unconditionally */
+        /* add entropy on daemon start and then every 60 seconds unconditionally */
         nbytes = poolSize / 2;
         r = (nbytes+sizeof(H_UINT)-1)/sizeof(H_UINT);
         if (havege_rng(h, (H_UINT *)output->buf, r)<1)
@@ -650,6 +656,8 @@ static void run_daemon(    /* RETURN: nothing   */
         output->entropy_count = nbytes * 8;
         if (ioctl(random_fd, RNDADDENTROPY, output) == -1)
           printf("Warning: RNDADDENTROPY failed!");
+        if (params->once == 1)
+          return;
         t[0] = t[1];
         continue;
       }
