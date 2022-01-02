@@ -1,8 +1,9 @@
-v1.9.16 (Dec 31, 2021)
+v1.9.16 (Jan 02, 2022)
 * Allow newuname syscall [Jirka Hladky]
 * Fix: haveged cannot be run as an application if also running as a daemon [Günther Brunthaler]
 * Add entropy unconditionally at start and then every 60 seconds [Jirka Hladky]
 * New parameter --once to refill entropy once and quit immediatelly [Jirka Hladky]
+* Added haveged-once.service to provide entropy once (intended for initramfs) [Jirka Hladky]
 
 v1.9.15 (Sep 30, 2021)
 * Check for sys/auxv.h before using it. [Peter Seiderer]
