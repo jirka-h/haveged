@@ -657,8 +657,10 @@ static void run_daemon(    /* RETURN: nothing   */
         if (ioctl(random_fd, RNDADDENTROPY, output) == -1)
           error_exit("RNDADDENTROPY failed!");
         h->n_entropy_bytes += nbytes;
-        if (params->once == 1)
+        if (params->once == 1) {
+          params->exit_code = 0;
           error_exit("Entropy refilled once (%d bytes), exiting.", nbytes);
+        }
         t[0] = t[1];
         continue;
       }
