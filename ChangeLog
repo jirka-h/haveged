@@ -1,3 +1,5 @@
+v1.9.17 (TBD)
+
 v1.9.16 (Jan 02, 2022)
 * Allow newuname syscall [Jirka Hladky]
 * Fix: haveged cannot be run as an application if also running as a daemon [Günther Brunthaler]
