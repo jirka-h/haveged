@@ -65,10 +65,12 @@ typedef int (*pRawIn)(volatile H_UINT *pData, H_UINT szData);
 #define H_DEBUG_LOOP      0x008           /* Show loop parameters          */
 #define H_DEBUG_COMPILE   0x010           /* Show assembly info            */
 #define H_DEBUG_OLT       0x020           /* Show all test info            */
+#define H_RNDADDENTROPY_INFO 0x040        /* RNDADDENTROPY info            */
 
 #define H_DEBUG_RAW_OUT   0x100           /* diagnostic output             */
 #define H_DEBUG_RAW_IN    0x200           /* diagnostic input              */
 #define H_DEBUG_TEST_IN   0x400           /* input test data               */
+
 /**
  * Initialization parameters. Use non-zero values to override default values.
  * Notes:

@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 #if  NUMBER_CORES>1
       "t", "threads",     "1", "Number of threads",
 #endif
-      "v", "verbose",     "1", "Verbose mask 0=none,1=summary,2=retries,4=timing,8=loop,16=code,32=test",
+      "v", "verbose",     "1", "Verbose mask 0=none,1=summary,2=retries,4=timing,8=loop,16=code,32=test,64=RNDADDENTROPY",
       "w", "write",       "1", "Set write_wakeup_threshold [bits]",
       "V", "version",     "0", "Print version information and exit",
       "h", "help",        "0", "This help"
@@ -636,6 +636,8 @@ static void run_daemon(    /* RETURN: nothing   */
    t[0] = 0;
    for(;;) {
       int current,nbytes,r,max=0;
+      H_UINT fills;
+      char buf[120];
       fd_set write_fd;
 #ifndef NO_COMMAND_MODE
       fd_set read_fd;
@@ -649,6 +651,7 @@ static void run_daemon(    /* RETURN: nothing   */
         /* add entropy on daemon start and then every 60 seconds unconditionally */
         nbytes = poolSize / 2;
         r = (nbytes+sizeof(H_UINT)-1)/sizeof(H_UINT);
+        fills = h->n_fills;
         if (havege_rng(h, (H_UINT *)output->buf, r)<1)
           error_exit("RNG failed! %d", h->error);
         output->buf_size = nbytes;
@@ -660,6 +663,10 @@ static void run_daemon(    /* RETURN: nothing   */
         if (params->once == 1) {
           params->exit_code = 0;
           error_exit("Entropy refilled once (%d bytes), exiting.", nbytes);
+        }
+        if (0 != (params->verbose & H_RNDADDENTROPY_INFO) && h->n_fills > fills) {
+          if (havege_status_dump(h, H_SD_TOPIC_SUM, buf, sizeof(buf))>0)
+            print_msg("%s\n", buf);
         }
         t[0] = t[1];
         continue;
@@ -738,6 +745,7 @@ static void run_daemon(    /* RETURN: nothing   */
       if(nbytes<1)   continue;
       /* get that many random bytes */
       r = (nbytes+sizeof(H_UINT)-1)/sizeof(H_UINT);
+      fills = h->n_fills;
       if (havege_rng(h, (H_UINT *)output->buf, r)<1)
          error_exit("RNG failed! %d", h->error);
       output->buf_size = nbytes;
@@ -747,6 +755,10 @@ static void run_daemon(    /* RETURN: nothing   */
       if (ioctl(random_fd, RNDADDENTROPY, output) == -1)
          error_exit("RNDADDENTROPY failed!");
       h->n_entropy_bytes += nbytes;
+      if (0 != (params->verbose & H_RNDADDENTROPY_INFO) && h->n_fills > fills) {
+        if (havege_status_dump(h, H_SD_TOPIC_SUM, buf, sizeof(buf))>0)
+          print_msg("%s\n", buf);
+      }
       }
 }
 /**
@@ -909,7 +921,7 @@ void print_msg(            /* RETURN: nothing   */
    ...)                    /* IN: args          */
 {
    char buffer[128];
-   
+
    va_list ap;
    va_start(ap, format);
    snprintf(buffer, sizeof(buffer), "%s: %s", params->daemon, format);
