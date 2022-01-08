@@ -7,7 +7,7 @@ After=systemd-tmpfiles-setup-dev.service
 Before=sysinit.target shutdown.target systemd-journald.service
 
 [Service]
-ExecStart=@SBIN_DIR@/haveged -w 1024 -v 1 --Foreground
+ExecStart=@SBIN_DIR@/haveged -w 1024 -v 1 --Foreground -v 64
 Restart=always
 SuccessExitStatus=137 143
 
@@ -29,7 +29,7 @@ RestrictRealtime=true
 LockPersonality=true
 MemoryDenyWriteExecute=true
 SystemCallArchitectures=native
-SystemCallFilter=@system-service newuname
+SystemCallFilter=@system-service
 SystemCallFilter=~@mount
 SystemCallErrorNumber=EPERM
 
