@@ -1,7 +1,7 @@
 %define dracutlibdir lib/dracut
 Summary:        A Linux entropy source using the HAVEGE algorithm
 Name:           haveged
-Version:        1.9.15
+Version:        1.9.17
 Release:        1%{?dist}
 License:        GPLv3+
 URL:            https://github.com/jirka-h/haveged
@@ -60,8 +60,11 @@ chmod 0644 COPYING README ChangeLog AUTHORS
 
 #Install systemd service file
 sed -e 's:@SBIN_DIR@:%{_sbindir}:g' -i contrib/Fedora/*service
+sed -i '/^ConditionKernelVersion/d' contrib/Fedora/*service
+
 install -Dpm 0644 contrib/Fedora/haveged.service %{buildroot}%{_unitdir}/%{name}.service
 install -Dpm 0644 contrib/Fedora/haveged-switch-root.service %{buildroot}%{_unitdir}/%{name}-switch-root.service
+install -Dpm 0644 contrib/Fedora/haveged-once.service %{buildroot}%{_unitdir}/%{name}-once.service
 install -Dpm 0755 contrib/Fedora/haveged-dracut.module %{buildroot}/%{_prefix}/%{dracutlibdir}/modules.d/98%{name}/module-setup.sh
 install -Dpm 0644 contrib/Fedora/90-haveged.rules %{buildroot}%{_udevrulesdir}/90-%{name}.rules
 
@@ -101,6 +104,15 @@ cp -p COPYING README ChangeLog AUTHORS contrib/build/havege_sample.c %{buildroot
 
 
 %changelog
+* Sat Jan 08 2022 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.17-1
+ - Update to 1.9.17
+
+* Mon Jan 03 2022 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.16-2
+ - Fixed ExecStart in haveged-once.service
+
+* Sun Jan 02 2022 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.16-1
+ - Update to 1.9.16
+
 * Thu Sep 30 2021 Jirka Hladky <hladky.jiri@gmail.com> - 1.9.15-1
  - Update to 1.9.15
 

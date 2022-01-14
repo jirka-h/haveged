@@ -1,3 +1,5 @@
+v1.9.18 (TBD)
+
 v1.9.17 (Jan 08, 2022)
 * Added new verbose mode [Jirka Hladky]
 * haveged-once.service - use @SBIN_DIR@ instead of hard-coded path [Jirka Hladky]

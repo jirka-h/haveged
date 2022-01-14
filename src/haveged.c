@@ -647,8 +647,8 @@ static void run_daemon(    /* RETURN: nothing   */
          error_exit("Stopping due to signal %d\n", params->exit_code - 128);
 
       t[1] = time(NULL);
-      if (t[1] - t[0] > 60) {
-        /* add entropy on daemon start and then every 60 seconds unconditionally */
+      if (t[1] - t[0] > 600) {
+        /* add entropy on daemon start and then every 600 seconds unconditionally */
         nbytes = poolSize / 2;
         r = (nbytes+sizeof(H_UINT)-1)/sizeof(H_UINT);
         fills = h->n_fills;
