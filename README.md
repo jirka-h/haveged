@@ -4,20 +4,17 @@ Haveged, an entropy source
 
 IMPORTANT UPDATE
 
-Starting from Linux kernel v5.6, the HAVEGED **service** has become obsolete. The userspace application as well as the haveged library are not affected. There are two main reasons for that:
+Starting from Linux kernel v5.6, the HAVEGED inspired algorithm has been included in the Linux kernel (see the [LKML article]( https://lore.kernel.org/lkml/alpine.DEB.2.21.1909290010500.2636@nanos.tec.linutronix.de/T/) and the Linux Kernel [commit](https://github.com/torvalds/linux/commit/30c08efec8884fb106b8e57094baa51bb4c44e32)). As soon as the CRNG (the Linux cryptographic-strength random number generator) gets ready, `/dev/random` does not block on reads anymore.
 
-1) The mainline Linux Kernel has now HAVEGED algorithm build in internally, see the [LKML article.]( https://lore.kernel.org/lkml/alpine.DEB.2.21.1909290010500.2636@nanos.tec.linutronix.de/T/)
+I'm happy that these changes made it into the mainline kernel. It's pleasing to see that the main idea behind HAVEGED has sustained time test - it was published already in 2003 [here.](https://www.irisa.fr/caps/projects/hipsor/publications/havege-tomacs.pdf) I'm also glad that the HAVEGE algorithm is being further explored and examined - see the [CPU Jitter Random Number Generator.](https://www.chronox.de/jent.html)
 
-2) Furthermore, as soon as the CRNG (the Linux cryptographic-strength random number generator) gets ready, `/dev/random` does not block on reads anymore. See the [kernel commit.](https://github.com/torvalds/linux/commit/30c08efec8884fb106b8e57094baa51bb4c44e32)
+It means that HAVEGED **service** is now less relevant. However, it's still useful in the following situations, when you
+* need randomness early in the boot process, before the CRNG in the Linux kernel gets fully initialized.
+* want to deploy an additional entropy source. HAVEGED now inserts entropy into the kernel every 60 seconds, regardless of the entropy level reported by Linux Kernel. It does not affect the `/dev/random` read speed but it diversifies the entropy sources, making the Linux Kernel CRNG more robust. 
+* you are looking for userspace RNG to generate random numbers. See `man -S8 haveged` for examples or try running `haveged -n 0 | pv > /dev/null`
+* and last but not least, most Linux installations are still running on the older kernel versions.
 
-I'm happy that these changes made it into the mainline kernel. It's nice to see that the main idea behind HAVEGED has sustained time test- it was published already in 2003 [here.](https://www.irisa.fr/caps/projects/hipsor/publications/havege-tomacs.pdf)
-
-I'm also glad that the HAVEGE algorithm is being further explored and examined - see the [CPU Jitter Random Number Generator.](https://www.chronox.de/jent.html)
-
-I will keep maintaining HAVEGED - there are a couple of reasons for that:
-* Most Linux installations are still running on the older kernel versions. 
-* HAVEGED can also be used as the userspace RNG to generate random numbers. See `man -S8 haveged` for examples or try running `haveged -n 0 | pv > /dev/null`
-* Last but not least, HAVEGED can be used as the RNG library. 
+In any case, I will keep maintaining the HAVEGED project. The userspace application, as well as the haveged library, are not affected in any way by changes in the Linux kernel.
 
 INTRODUCTION
 
