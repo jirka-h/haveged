@@ -8,6 +8,8 @@ Starting from Linux kernel v5.6, the HAVEGED inspired algorithm has been include
 
 I'm happy that these changes made it into the mainline kernel. It's pleasing to see that the main idea behind HAVEGED has sustained time test - it was published already in 2003 [here.](https://www.irisa.fr/caps/projects/hipsor/publications/havege-tomacs.pdf) I'm also glad that the HAVEGE algorithm is being further explored and examined - see the [CPU Jitter Random Number Generator.](https://www.chronox.de/jent.html)
 
+Please note that while the mainline Linux Kernel and HAVEGED are using the same concept to generate the entropy (utilizing the CPU jitter) the implementation is completely different. In this sense, HAVEGED can be viewed as another entropy source. 
+
 It means that HAVEGED **service** is now less relevant. However, it's still useful in the following situations, when you
 * need randomness early in the boot process, before the CRNG in the Linux kernel gets fully initialized.
 * want to deploy an additional entropy source. HAVEGED now inserts entropy into the kernel every 60 seconds, regardless of the entropy level reported by Linux Kernel. It does not affect the `/dev/random` read speed but it diversifies the entropy sources, making the Linux Kernel CRNG more robust. 
