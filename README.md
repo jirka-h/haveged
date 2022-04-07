@@ -4,7 +4,7 @@ Haveged, an entropy source
 
 IMPORTANT UPDATE
 
-Starting from Linux kernel v5.6, the HAVEGED inspired algorithm has been included in the Linux kernel (see the [LKML article]( https://lore.kernel.org/lkml/alpine.DEB.2.21.1909290010500.2636@nanos.tec.linutronix.de/T/) and the Linux Kernel [commit](https://github.com/torvalds/linux/commit/30c08efec8884fb106b8e57094baa51bb4c44e32)). As soon as the CRNG (the Linux cryptographic-strength random number generator) gets ready, `/dev/random` does not block on reads anymore.
+Starting from Linux kernel v5.4, the HAVEGED inspired algorithm has been included in the Linux kernel (see the [LKML article]( https://lore.kernel.org/lkml/alpine.DEB.2.21.1909290010500.2636@nanos.tec.linutronix.de/T/) and the Linux Kernel [commit](https://github.com/torvalds/linux/commit/50ee7529ec4500c88f8664560770a7a1b65db72b)). Additionally, since v5.6, as soon as the CRNG (the Linux cryptographic-strength random number generator) gets ready, `/dev/random` does not block on reads anymore (see [this commit](https://github.com/torvalds/linux/commit/30c08efec8884fb106b8e57094baa51bb4c44e32)).
 
 I'm happy that these changes made it into the mainline kernel. It's pleasing to see that the main idea behind HAVEGED has sustained time test - it was published already in 2003 [here.](https://www.irisa.fr/caps/projects/hipsor/publications/havege-tomacs.pdf) I'm also glad that the HAVEGE algorithm is being further explored and examined - see the [CPU Jitter Random Number Generator.](https://www.chronox.de/jent.html)
 
