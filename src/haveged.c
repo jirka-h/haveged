@@ -649,7 +649,7 @@ static void run_daemon(    /* RETURN: nothing   */
       t[1] = time(NULL);
       if (t[1] - t[0] > 600) {
         /* add entropy on daemon start and then every 600 seconds unconditionally */
-        nbytes = poolSize / 2;
+        nbytes = poolSize;
         r = (nbytes+sizeof(H_UINT)-1)/sizeof(H_UINT);
         fills = h->n_fills;
         if (havege_rng(h, (H_UINT *)output->buf, r)<1)
@@ -741,7 +741,7 @@ static void run_daemon(    /* RETURN: nothing   */
       if (ioctl(random_fd, RNDGETENTCNT, &current) == -1)
          error_exit("Couldn't query entropy-level from kernel");
       /* get number of bytes needed to fill pool */
-      nbytes = (poolSize  - current)/8;
+      nbytes = (poolSize - current + 7)/8;
       if(nbytes<1)   continue;
       /* get that many random bytes */
       r = (nbytes+sizeof(H_UINT)-1)/sizeof(H_UINT);
