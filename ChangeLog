@@ -1,4 +1,6 @@
-v1.9.18 (TBD)
+v1.9.18 (Apr 09, 2022) [Jirka Hladky]
+* Round bits up and target full pool size [Jason A. Donenfeld]
+* Specify right kernel commit in README [Jason A. Donenfeld]
 
 v1.9.17 (Jan 08, 2022)
 * Added new verbose mode [Jirka Hladky]
