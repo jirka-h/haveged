@@ -31,7 +31,7 @@ extern "C" {
  * header/package version as a numeric major, minor, patch triple. See havege_version()
  * below for usage.
  */
-#define  HAVEGE_PREP_VERSION  "1.9.18"
+#define  HAVEGE_PREP_VERSION  "1.9.19"
 /**
  * Basic types
  */
