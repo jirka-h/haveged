@@ -10,7 +10,7 @@ AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE([subdir-objects no-dependencies])
 AC_CONFIG_SRCDIR([src/haveged.c])
 AC_CHECK_TYPES([uint32_t, uint8_t])
-HA_LDFLAGS=""
+HA_LDFLAGS="-pthread"
 
 ##libtool_start##
 LT_INIT
@@ -73,7 +73,6 @@ AC_ARG_ENABLE(threads,
    , enable_threads="no")
 if test "x$enable_threads" = "xyes"; then
    AC_DEFINE(NUMBER_CORES, 4, [Define maxium number of collection threads])
-   HA_LDFLAGS="-pthread"
 else
    AC_DEFINE(NUMBER_CORES, 1, [Define to single collection thread])
 fi

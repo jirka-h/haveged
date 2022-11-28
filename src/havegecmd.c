@@ -39,6 +39,7 @@
 #include <sys/stat.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <semaphore.h>
 
 #ifndef HAVE_STRUCT_UCRED
 struct ucred
@@ -54,6 +55,7 @@ struct ucred
 int first_byte;
 int socket_fd;
 static char errmsg[1024];
+extern  sem_t *sem;
 
 static int new_root(               /* RETURN: status                        */
    const char *root,               /* IN: path of the new root file system  */
@@ -95,6 +97,7 @@ static int new_root(               /* RETURN: status                        */
                strerror(errno));
       goto err;
       }
+   sem_close(sem);
    ret = execv((const char *)path, argv);
    if (ret < 0) {
       snprintf(&errmsg[0], sizeof(errmsg)-1,
@@ -265,8 +268,14 @@ int socket_handler(                /* RETURN: closed file descriptor        */
       }
 
    if (magic[1] == '\002') {       /* ASCII start of text: read argument provided */
-      uint32_t alen;
+      uint32_t alen = 0;
 
+      /*
+       * wait for the haveged -c instance to finish writting
+       * before continuing to read from the socket
+       */
+      sem_wait(sem);
+      sem_post(sem);
       ret = receive_uinteger(fd, &alen);
       if (ret < 0) {
          print_msg("%s: can not read from UNIX socket\n", params->daemon);
@@ -285,6 +294,11 @@ int socket_handler(                /* RETURN: closed file descriptor        */
          print_msg("%s: can not read from UNIX socket\n", params->daemon);
          goto out;
          }
+      /*
+       * We no more need the semaphore unlink it
+       * Not sure if it is the best place to unlink here
+       */
+      sem_unlink(SEM_NAME);
       }
 
    clen = sizeof(struct ucred);
@@ -444,7 +458,7 @@ int receive_uinteger(              /* RETURN: status                        */
    int fd,                         /* IN: file descriptor                   */
    uint32_t *value)                /* OUT: 32 bit unsigned integer          */
 {
-   uint8_t buffer[4];
+   uint8_t buffer[4] = {0};
 
    if (safein(fd, buffer, 4 * sizeof(uint8_t)) < 0)
       return -1;

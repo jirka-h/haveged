@@ -49,6 +49,8 @@ extern "C" {
 #define SOCK_NONBLOCK 0
 #endif
 
+#define SEM_NAME "haveged_sem"
+
 /**
  * Open and listen on a UNIX socket to get command from there
  */
