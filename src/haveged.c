@@ -34,6 +34,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#include <semaphore.h>
 
 #ifndef NO_DAEMON
 #include <syslog.h>
@@ -130,6 +131,8 @@ static void tidy_exit(int signum);
 static void usage(int db, int nopts, struct option *long_options, const char **cmds);
 
 static sigset_t mask, omask;
+
+sem_t *sem = NULL;
 
 #define  ATOU(a)     (unsigned int)atoi(a)
 /**
@@ -360,6 +363,15 @@ int main(int argc, char **argv)
       fd_set read_fd;
       sigset_t block;
 
+      /* init semaphore */
+      sem = sem_open(SEM_NAME, 0);
+      if (sem == NULL) {
+         print_msg("sem_open() failed \n");
+         print_msg("Error : %s \n", strerror(errno));
+         ret = -1;
+         goto err;
+         }
+
       socket_fd = cmd_connect(params);
       if (socket_fd < 0) {
          ret = -1;
@@ -377,9 +389,19 @@ int main(int argc, char **argv)
             root = optarg;
             size = (uint32_t)strlen(root)+1;
             cmd[1] = '\002';
+            /*
+             * Synchronise haveged -c instance and daemon instance
+             * prevent daemon instance from readin messages
+             * from the socket until the -c instance finish writting
+             */
+            sem_wait(sem);
             safeout(socket_fd, &cmd[0], 2);
             send_uinteger(socket_fd, size);
             safeout(socket_fd, root, size);
+            /*
+             * unblock the daemon instance as we finished writting
+             */
+            sem_post(sem);
             break;
          case MAGIC_CLOSE:
             ptr = &cmd[0];
@@ -440,6 +462,7 @@ int main(int argc, char **argv)
          }
    err:
       close(socket_fd);
+      sem_close(sem);
       return ret;
       }
    else if (!(params->setup & RUN_AS_APP)){
@@ -454,6 +477,11 @@ int main(int argc, char **argv)
             fprintf(stderr, "%s: can not initialize command socket: %s\n", params->daemon, strerror(errno));
             fprintf(stderr, "%s: disabling command mode for this instance\n", params->daemon);
          }
+      }
+      /* Initilize named semaphore to synchronize command isntances */
+      sem = sem_open(SEM_NAME, O_CREAT, 0644, 1);
+      if (sem == NULL) {
+         error_exit("Couldn't create nammed semaphore " SEM_NAME" error: %s", strerror(errno));
       }
     }
 #endif
