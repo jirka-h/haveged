@@ -114,7 +114,7 @@ H_PTR havege_create(             /* RETURN: app state    */
       n = 1;
    if (0 == sz)
       sz = DEFAULT_BUFSZ;
-   anchor = (H_SETUP *)calloc(sizeof(H_SETUP),1);
+   anchor = (H_SETUP *)calloc(1, sizeof(H_SETUP));
    if (NULL==anchor)
       return h;
    h   = &anchor->info;

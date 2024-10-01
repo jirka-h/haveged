@@ -1,7 +1,7 @@
 /**
  ** Simple entropy harvester based upon the havege RNG
  **
- ** Copyright 2018-2022 Jirka Hladky hladky DOT jiri AT gmail DOT com
+ ** Copyright 2018-2024 Jirka Hladky hladky DOT jiri AT gmail DOT com
  ** Copyright 2009-2014 Gary Wuertz gary@issiweb.com
  ** Copyright 2011-2012 BenEleventh Consulting manolson@beneleventh.com
  **
@@ -61,7 +61,7 @@
 // {{{ VERSION_TEXT
 static const char* VERSION_TEXT =
   "haveged %s\n\n"
-  "Copyright (C) 2018-2022 Jirka Hladky <hladky.jiri@gmail.com>\n"
+  "Copyright (C) 2018-2024 Jirka Hladky <hladky.jiri@gmail.com>\n"
   "Copyright (C) 2009-2014 Gary Wuertz <gary@issiweb.com>\n"
   "Copyright (C) 2011-2012 BenEleventh Consulting <manolson@beneleventh.com>\n\n"
   "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\n"
@@ -94,7 +94,8 @@ static struct pparams defaults = {
   .sample_out     = OUTPUT_DEFAULT,
   .verbose        = 0,
   .watermark      = "/proc/sys/kernel/random/write_wakeup_threshold",
-  .command        = 0
+  .command        = 0,
+  .time_interval  = TIME_INTERVAL
   };
 struct pparams *params = &defaults;
 
@@ -164,6 +165,7 @@ int main(int argc, char **argv)
 #if  NUMBER_CORES>1
       "t", "threads",     "1", "Number of threads",
 #endif
+      "T", "time_interval", "1", "Time interval in seconds to add entropy unconditionally. Max rate/timestep is " TOSTRING(PSELECT_TIMEOUT) " seconds. Default: " TOSTRING(TIME_INTERVAL) " seconds.",
       "v", "verbose",     "1", "Verbose mask 0=none,1=summary,2=retries,4=timing,8=loop,16=code,32=test,64=RNDADDENTROPY",
       "w", "write",       "1", "Set write_wakeup_threshold [bits]",
       "V", "version",     "0", "Print version information and exit",
@@ -263,7 +265,7 @@ int main(int argc, char **argv)
             if (0 == (params->setup & MULTI_CORE))
                continue;
             break;
-         case 'p':   case 'w':  case 'F':
+         case 'p':   case 'w':  case 'F': case 'T':
             if (0 !=(params->setup & RUN_AS_APP))
                continue;
             break;
@@ -274,12 +276,18 @@ int main(int argc, char **argv)
       long_options[i].val       = cmds[j][0];
       strcat(short_options,cmds[j]);
       if (long_options[i].has_arg!=0) strcat(short_options,":");
+      // printf("Long option number %u\n", i);
+      // printf("name\t%s\n", long_options[i].name);
+      // printf("has_arg\t%d\n", long_options[i].has_arg);
+
       i += 1;
       }
    memset(&long_options[i], 0, sizeof(struct option));
 
+   // printf("Short %s\n", short_options);
    do {
       c = getopt_long (argc, argv, short_options, long_options, NULL);
+      // printf("Char %c\n", c);
       switch(c) {
          case 'F':
             params->setup |= RUN_IN_FG;
@@ -336,6 +344,9 @@ int main(int argc, char **argv)
             params->ncores = ATOU(optarg);
             if (params->ncores > NUMBER_CORES)
                error_exit("invalid thread count: %s", optarg);
+            break;
+         case 'T':
+            params->time_interval = ATOU(optarg);
             break;
          case 'v':
             params->verbose  = ATOU(optarg);
@@ -423,8 +434,8 @@ int main(int argc, char **argv)
       FD_SET(socket_fd, &read_fd);
 
       do {
-         struct timeval two = {6, 0};
-         ret = select(socket_fd+1, &read_fd, NULL, NULL, &two);
+         struct timeval timeout = {6, 0};
+         ret = select(socket_fd+1, &read_fd, NULL, NULL, &timeout);
          if (ret >= 0) break;
          if (errno != EINTR)
             error_exit("Select error: %s", strerror(errno));
@@ -439,7 +450,7 @@ int main(int argc, char **argv)
                char *msg;
                ret = receive_uinteger(socket_fd, &size);
                if (ret < 0)
-                  goto err;		   
+                  goto err;
                msg = calloc(size, sizeof(char));
                if (!msg)
                   error_exit("can not allocate memory for message from UNIX socket: %s",
@@ -675,8 +686,8 @@ static void run_daemon(    /* RETURN: nothing   */
          error_exit("Stopping due to signal %d\n", params->exit_code - 128);
 
       t[1] = time(NULL);
-      if (t[1] - t[0] > 60) {
-        /* add entropy on daemon start and then every 60 seconds unconditionally */
+      if (t[1] - t[0] > params->time_interval) {
+        /* add entropy on daemon start and then every TIME_INTERVAL seconds unconditionally */
         nbytes = poolSize;
         r = (nbytes+sizeof(H_UINT)-1)/sizeof(H_UINT);
         fills = h->n_fills;
@@ -722,17 +733,20 @@ static void run_daemon(    /* RETURN: nothing   */
        }
 #endif
       for(;;)  {
-         struct timespec two = {2, 0};
+         struct timespec timeout = {PSELECT_TIMEOUT, 0};
          int rc;
 #ifndef NO_COMMAND_MODE
          if (socket_fd >= 0) {
-           rc = pselect(max+1, &read_fd, &write_fd, NULL, &two, &omask);
+           rc = pselect(max+1, &read_fd, &write_fd, NULL, &timeout, &omask);
          } else {
-           rc = pselect(max+1, NULL, &write_fd, NULL, &two, &omask);
+           rc = pselect(max+1, NULL, &write_fd, NULL, &timeout, &omask);
          }
 #else
-         rc = pselect(max+1, NULL, &write_fd, NULL, &two, &omask);
+         rc = pselect(max+1, NULL, &write_fd, NULL, &timeout, &omask);
 #endif
+         t[1] = time(NULL);
+         if (t[1] - t[0] > params->time_interval) break;
+
          if (rc >= 0) break;
          if (params->exit_code > 128)
             break;
@@ -1067,7 +1081,7 @@ static void usage(               /* OUT: nothing            */
    const char **cmds)            /* IN: associated text     */
 {
   int i, j;
-  
+
   (void)loc;
   fprintf(stderr, "\nUsage: %s [options]\n\n", params->daemon);
 #ifndef NO_DAEMON
@@ -1079,7 +1093,7 @@ static void usage(               /* OUT: nothing            */
   for(i=j=0;long_options[i].val != 0;i++,j+=4) {
     while(cmds[j][0] != long_options[i].val && (j+4) < (nopts * 4))
       j += 4;
-    fprintf(stderr,"     --%-10s, -%c %s %s\n",
+    fprintf(stderr,"     --%-13s, -%c %s %s\n",
       long_options[i].name, long_options[i].val,
       long_options[i].has_arg? "[]":"  ",cmds[j+3]);
     }
