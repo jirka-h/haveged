@@ -1,4 +1,5 @@
-v1.9.19 (TBD)
+v1.9.19 (Oct 02, 2024) [Jirka Hladky]
+* Added --time_interval N to add entropy unconditionally every N seconds
 
 v1.9.18 (Apr 09, 2022) [Jirka Hladky]
 * Round bits up and target full pool size [Jason A. Donenfeld]
