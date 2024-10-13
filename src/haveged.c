@@ -489,10 +489,11 @@ int main(int argc, char **argv)
             fprintf(stderr, "%s: disabling command mode for this instance\n", params->daemon);
          }
       }
-      /* Initilize named semaphore to synchronize command isntances */
+      /* Initilize named semaphore to synchronize command instances */
       sem = sem_open(SEM_NAME, O_CREAT, 0644, 1);
       if (sem == NULL) {
-         error_exit("Couldn't create nammed semaphore " SEM_NAME" error: %s", strerror(errno));
+         fprintf(stderr, "Warning: Couldn't create named semaphore " SEM_NAME" error: %s", strerror(errno));
+         fprintf(stderr, "         %s: disabling command mode for this instance\n", params->daemon);
       }
     }
 #endif
