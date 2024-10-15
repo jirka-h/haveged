@@ -1,3 +1,6 @@
+v1.9.20 (Oct 15, 2024) [Jirka Hladky]
+* Only warn when creating of named semaphore fails
+
 v1.9.19 (Oct 02, 2024) [Jirka Hladky]
 * Added --time_interval N to add entropy unconditionally every N seconds
 
