@@ -490,6 +490,12 @@ int main(int argc, char **argv)
          }
       }
       /* Initilize named semaphore to synchronize command instances */
+      if (mkdir("/dev/shm", 0755) != 0) {
+        if (errno != EEXIST) {
+          error_exit("Couldn't create /dev/shm directory: %s", strerror(errno));
+        }
+      }
+
       sem = sem_open(SEM_NAME, O_CREAT, 0644, 1);
       if (sem == NULL) {
          fprintf(stderr, "Warning: Couldn't create named semaphore " SEM_NAME" error: %s", strerror(errno));
