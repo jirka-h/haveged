@@ -1,5 +1,6 @@
 v1.9.20 (Apr 29, 2026) [Jirka Hladky]
 * Only warn when creating of named semaphore fails
+* Creating /dev/shm if its not existing, otherwise haveged fails to start
 * Fixed several typos
 
 v1.9.19 (Oct 02, 2024) [Jirka Hladky]
