@@ -317,6 +317,7 @@ int socket_handler(                /* RETURN: closed file descriptor        */
       ptr = (unsigned char *)enqry;
       len = (int)strlen(enqry)+1;
       safeout(fd, ptr, len);
+      goto out;
       }
 
    switch (magic[0]) {
