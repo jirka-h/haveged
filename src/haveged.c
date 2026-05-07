@@ -376,10 +376,11 @@ int main(int argc, char **argv)
 
       /* init semaphore */
       sem = sem_open(SEM_NAME, 0);
-      if (sem == NULL) {
+      if (sem == SEM_FAILED) {
          print_msg("sem_open() failed \n");
          print_msg("Error : %s \n", strerror(errno));
          ret = -1;
+         sem = NULL;
          goto err;
          }
 
@@ -473,7 +474,9 @@ int main(int argc, char **argv)
          }
    err:
       close(socket_fd);
-      sem_close(sem);
+      if (sem) {
+         sem_close(sem);
+         }
       return ret;
       }
    else if (!(params->setup & RUN_AS_APP)){
@@ -497,9 +500,10 @@ int main(int argc, char **argv)
       }
 
       sem = sem_open(SEM_NAME, O_CREAT, 0644, 1);
-      if (sem == NULL) {
+      if (sem == SEM_FAILED) {
          fprintf(stderr, "Warning: Couldn't create named semaphore " SEM_NAME" error: %s", strerror(errno));
          fprintf(stderr, "         %s: disabling command mode for this instance\n", params->daemon);
+         sem = NULL;
       }
     }
 #endif

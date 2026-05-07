@@ -97,7 +97,9 @@ static int new_root(               /* RETURN: status                        */
                strerror(errno));
       goto err;
       }
-   sem_close(sem);
+   if (sem) {
+       sem_close(sem);
+       }
    ret = execv((const char *)path, argv);
    if (ret < 0) {
       snprintf(&errmsg[0], sizeof(errmsg)-1,
@@ -293,8 +295,10 @@ int socket_handler(                /* RETURN: closed file descriptor        */
        * wait for the haveged -c instance to finish writting
        * before continuing to read from the socket
        */
-      sem_wait(sem);
-      sem_post(sem);
+      if (sem != NULL) {
+         sem_wait(sem);
+         sem_post(sem);
+         }
       ret = receive_uinteger(fd, &alen);
       if (ret < 0) {
          print_msg("%s: can not read from UNIX socket\n", params->daemon);
@@ -317,7 +321,9 @@ int socket_handler(                /* RETURN: closed file descriptor        */
        * We no more need the semaphore unlink it
        * Not sure if it is the best place to unlink here
        */
-      sem_unlink(SEM_NAME);
+      if (sem != NULL) {
+         sem_unlink(SEM_NAME);
+         }
       }
 
    switch (magic[0]) {
