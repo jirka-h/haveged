@@ -249,7 +249,7 @@ int socket_handler(                /* RETURN: closed file descriptor        */
    struct pparams *params)         /* IN: input params                      */
 {
    struct ucred cred = {0};
-   unsigned char magic[2], *ptr;
+   unsigned char magic[2] = {0}, *ptr;
    char *enqry;
    char *optarg = NULL;
    socklen_t clen;
@@ -257,6 +257,25 @@ int socket_handler(                /* RETURN: closed file descriptor        */
 
    if (fd < 0) {
       print_msg("%s: no connection jet\n", params->daemon);
+      }
+
+   clen = sizeof(struct ucred);
+   ret = getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &cred, &clen);
+   if (ret < 0) {
+      print_msg("%s: can not get credentials from UNIX socket part1\n", params->daemon);
+      goto out;
+      }
+   if (clen != sizeof(struct ucred)) {
+      print_msg("%s: can not get credentials from UNIX socket part2\n", params->daemon);
+      goto out;
+      }
+   if (cred.uid != 0) {
+      enqry = ASCII_NAK;
+
+      ptr = (unsigned char *)enqry;
+      len = (int)strlen(enqry)+1;
+      safeout(fd, ptr, len);
+      goto out;
       }
 
    ptr = &magic[0];
@@ -299,25 +318,6 @@ int socket_handler(                /* RETURN: closed file descriptor        */
        * Not sure if it is the best place to unlink here
        */
       sem_unlink(SEM_NAME);
-      }
-
-   clen = sizeof(struct ucred);
-   ret = getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &cred, &clen);
-   if (ret < 0) {
-      print_msg("%s: can not get credentials from UNIX socket part1\n", params->daemon);
-      goto out;
-      }
-   if (clen != sizeof(struct ucred)) {
-      print_msg("%s: can not get credentials from UNIX socket part2\n", params->daemon);
-      goto out;
-      }
-   if (cred.uid != 0) {
-      enqry = ASCII_NAK;
-
-      ptr = (unsigned char *)enqry;
-      len = (int)strlen(enqry)+1;
-      safeout(fd, ptr, len);
-      goto out;
       }
 
    switch (magic[0]) {
