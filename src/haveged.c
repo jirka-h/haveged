@@ -493,7 +493,7 @@ int main(int argc, char **argv)
          }
       }
       /* Initialize named semaphore to synchronize command instances */
-      if (mkdir("/dev/shm", 0755) != 0) {
+      if (mkdir("/dev/shm", 01777) != 0) {
         if (errno != EEXIST) {
           error_exit("Couldn't create /dev/shm directory: %s", strerror(errno));
         }
