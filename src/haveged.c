@@ -497,6 +497,8 @@ int main(int argc, char **argv)
         if (errno != EEXIST) {
           error_exit("Couldn't create /dev/shm directory: %s", strerror(errno));
         }
+      } else {
+        chmod("/dev/shm", 01777);
       }
 
       sem = sem_open(SEM_NAME, O_CREAT, 0644, 1);
