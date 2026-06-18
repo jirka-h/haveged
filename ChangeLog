@@ -1,3 +1,9 @@
+v1.9.23 (Jun 18, 2026) [Jirka Hladky]
+* Use O_EXCL with sem_open to prevent semaphore pre-planting attacks [pyllyukko]
+* Recover stale semaphores after SIGKILL by unlinking and retrying
+* Add sem_close before sem_unlink for proper cleanup ordering
+* Fix compilation when NO_COMMAND_MODE is defined
+
 v1.9.22 (May 21, 2026) [Jirka Hladky]
 * Add ReadWritePaths=/dev/shm to systemd service for semaphore creation
   under ProtectSystem=full sandboxing
