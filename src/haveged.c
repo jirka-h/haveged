@@ -502,8 +502,19 @@ int main(int argc, char **argv)
       }
 
       sem = sem_open(SEM_NAME, O_CREAT | O_EXCL, 0644, 1);
+      if (sem == SEM_FAILED && errno == EEXIST) {
+         /* Stale semaphore from a previous instance (e.g. after SIGKILL) —
+            we already know no other instance is running because cmd_listen
+            would have detected it above. */
+         sem_unlink(SEM_NAME);
+         sem = sem_open(SEM_NAME, O_CREAT | O_EXCL, 0644, 1);
+      }
       if (sem == SEM_FAILED) {
-         fprintf(stderr, "Warning: Couldn't create named semaphore " SEM_NAME" error: %s", strerror(errno));
+         if (errno == EEXIST)
+            fprintf(stderr, "Warning: Named semaphore " SEM_NAME " already exists; "
+                    "check for another running instance or stale semaphore in /dev/shm\n");
+         else
+            fprintf(stderr, "Warning: Couldn't create named semaphore " SEM_NAME ": %s\n", strerror(errno));
          fprintf(stderr, "         %s: disabling command mode for this instance\n", params->daemon);
          sem = NULL;
       }
@@ -880,7 +891,13 @@ void error_exit(           /* RETURN: nothing   */
       }
    }
    havege_destroy(handle);
+#ifndef NO_COMMAND_MODE
+   if (sem != NULL) {
+      sem_close(sem);
+      sem = NULL;
+   }
    sem_unlink(SEM_NAME);
+#endif
    exit(params->exit_code);
 }
 /**
