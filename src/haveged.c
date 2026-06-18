@@ -501,7 +501,7 @@ int main(int argc, char **argv)
         chmod("/dev/shm", 01777);
       }
 
-      sem = sem_open(SEM_NAME, O_CREAT, 0644, 1);
+      sem = sem_open(SEM_NAME, O_CREAT | O_EXCL, 0644, 1);
       if (sem == SEM_FAILED) {
          fprintf(stderr, "Warning: Couldn't create named semaphore " SEM_NAME" error: %s", strerror(errno));
          fprintf(stderr, "         %s: disabling command mode for this instance\n", params->daemon);
@@ -880,6 +880,7 @@ void error_exit(           /* RETURN: nothing   */
       }
    }
    havege_destroy(handle);
+   sem_unlink(SEM_NAME);
    exit(params->exit_code);
 }
 /**
