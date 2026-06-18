@@ -501,13 +501,13 @@ int main(int argc, char **argv)
         chmod("/dev/shm", 01777);
       }
 
-      sem = sem_open(SEM_NAME, O_CREAT | O_EXCL, 0644, 1);
+      sem = sem_open(SEM_NAME, O_CREAT | O_EXCL, 0600, 1);
       if (sem == SEM_FAILED && errno == EEXIST) {
          /* Stale semaphore from a previous instance (e.g. after SIGKILL) —
             we already know no other instance is running because cmd_listen
             would have detected it above. */
          sem_unlink(SEM_NAME);
-         sem = sem_open(SEM_NAME, O_CREAT | O_EXCL, 0644, 1);
+         sem = sem_open(SEM_NAME, O_CREAT | O_EXCL, 0600, 1);
       }
       if (sem == SEM_FAILED) {
          if (errno == EEXIST)
@@ -608,16 +608,19 @@ int main(int argc, char **argv)
 static void daemonize(     /* RETURN: nothing   */
    void)                   /* IN: nothing       */
 {
-   FILE *fh;
+   int pid_fd;
+   char pidbuf[16];
    openlog(params->daemon, LOG_CONS, LOG_DAEMON);
    syslog(LOG_NOTICE, "%s starting up", params->daemon);
    if (daemon(0, 0) == -1)
       error_exit("Cannot fork into the background");
-   fh = fopen(params->pid_file, "w");
-   if (!fh)
+   pid_fd = open(params->pid_file, O_WRONLY|O_CREAT|O_TRUNC|O_NOFOLLOW, 0644);
+   if (pid_fd < 0)
       error_exit("Couldn't open PID file \"%s\" for writing: %s.", params->pid_file, strerror(errno));
-   fprintf(fh, "%i", getpid());
-   fclose(fh);
+   snprintf(pidbuf, sizeof(pidbuf), "%i", getpid());
+   if (write(pid_fd, pidbuf, strlen(pidbuf)) < 0)
+      error_exit("Couldn't write PID file \"%s\": %s.", params->pid_file, strerror(errno));
+   close(pid_fd);
    params->detached = 1;
 }
 /**
@@ -683,7 +686,7 @@ static void run_daemon(    /* RETURN: nothing   */
       error_exit("lstat has failed for the random device \"%s\": %s", params->random_device, strerror(errno));
    if ( S_ISLNK(stat_buf.st_mode) )
       error_exit("random device \"%s\" is a link. This is not supported for the security reasons.", params->random_device);
-   random_fd = open(params->random_device, O_RDWR);
+   random_fd = open(params->random_device, O_RDWR | O_CLOEXEC);
    if (random_fd == -1)
      error_exit("Couldn't open random device: %s", strerror(errno));
 

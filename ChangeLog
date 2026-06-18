@@ -3,6 +3,11 @@ v1.9.23 (Jun 18, 2026) [Jirka Hladky]
 * Recover stale semaphores after SIGKILL by unlinking and retrying
 * Add sem_close before sem_unlink for proper cleanup ordering
 * Fix compilation when NO_COMMAND_MODE is defined
+* Fix out-of-bounds memory access in safein()/safeout() on socket errors
+* Reject command socket connections from different user namespaces
+* Use O_NOFOLLOW for PID file to prevent symlink attacks
+* Open random device with O_CLOEXEC to prevent fd leak across execv
+* Restrict semaphore permissions from 0644 to 0600
 
 v1.9.22 (May 21, 2026) [Jirka Hladky]
 * Add ReadWritePaths=/dev/shm to systemd service for semaphore creation
