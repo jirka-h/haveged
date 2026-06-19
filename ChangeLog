@@ -1,3 +1,8 @@
+v1.9.24 (Jun 19, 2026) [Jirka Hladky]
+* Add --no-command / -C flag to disable command mode at runtime
+* Disable command mode in haveged.service and haveged-once.service
+* Enable PrivateNetwork=true and remove ReadWritePaths=/dev/shm in service files
+
 v1.9.23 (Jun 18, 2026) [Jirka Hladky]
 * Use O_EXCL with sem_open to prevent semaphore pre-planting attacks [pyllyukko]
 * Recover stale semaphores after SIGKILL by unlinking and retrying
