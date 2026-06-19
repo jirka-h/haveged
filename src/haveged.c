@@ -152,6 +152,7 @@ int main(int argc, char **argv)
       "d", "data",        "1", SETTINGR("Data cache size [KB], with fallback to: ", GENERIC_DCACHE ),
 #ifndef NO_COMMAND_MODE
       "c", "command",     "1", "Send a command mode to an already running haveged",
+      "C", "no-command",  "0", "Disable command mode (no socket, no semaphore)",
 #endif
       "i", "inst",        "1", SETTINGR("Instruction cache size [KB], with fallback to: ", GENERIC_ICACHE),
       "f", "file",        "1", "Sample output file,  default: '" OUTPUT_DEFAULT "', '-' for stdout",
@@ -306,6 +307,9 @@ int main(int argc, char **argv)
          case 'c':
             params->command = optarg;
             params->setup |= CMD_MODE;
+            break;
+         case 'C':
+            params->setup |= NO_CMD_FLAG;
             break;
 #endif
          case 'd':
@@ -479,7 +483,7 @@ int main(int argc, char **argv)
          }
       return ret;
       }
-   else if (!(params->setup & RUN_AS_APP)){
+   else if (!(params->setup & RUN_AS_APP) && !(params->setup & NO_CMD_FLAG)){
       socket_fd = cmd_listen(params);
       if (socket_fd >= 0)
          fprintf(stderr, "%s: command socket is listening at fd %d\n", params->daemon, socket_fd);
