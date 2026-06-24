@@ -53,7 +53,7 @@ struct ucred
 #include "havegecmd.h"
 
 int first_byte;
-int socket_fd;
+int socket_fd = -1;
 static char errmsg[1024];
 extern  sem_t *sem;
 

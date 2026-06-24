@@ -1,3 +1,7 @@
+v1.9.26 (Jun 24, 2026) [Jirka Hladky]
+* Fix 100% CPU spin when --no-command is used (BZ#2492029)
+* Initialize socket_fd to -1 so daemon loop skips accept() correctly
+
 v1.9.25 (Jun 24, 2026) [Jirka Hladky]
 * Add haveged-initramfs.service for use inside the initramfs (BZ#2491739)
 * Update dracut module to use initramfs-specific service file
