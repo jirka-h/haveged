@@ -1,3 +1,9 @@
+v1.9.27 (Oct 18, 2026) [Jirka Hladky]
+* Fix signed integer overflow and undefined shifts in vfs topology parsing [liweiganga]
+* Fix out-of-bounds write in vfs_parseMask with masks of more than 8 words
+  (more than 256 possible CPUs) and stale msw after bitmap clear [liweiganga]
+* vfs_parseList: avoid signed overflow and negative bitmap index on huge numbers
+
 v1.9.26 (Jun 24, 2026) [Jirka Hladky]
 * Fix 100% CPU spin when --no-command is used (BZ#2492029)
 * Initialize socket_fd to -1 so daemon loop skips accept() correctly
