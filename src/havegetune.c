@@ -868,6 +868,9 @@ static void vfs_parseList( /* RETURN: None               */
    char *term, c;
    int  bounds[2], n;
  
+   /* Values at or above the bitmap size are ignored by cfg_bitSet(), so stop
+    * accumulating digits once out of range. This avoids signed overflow and
+    * keeps the range loop below bounded. */
    cfg_bitClear(map);
    for(term = strtok(input, ",");term != NULL;term = strtok(NULL, ",")) {
       n = bounds[0] = bounds[1] = 0;
@@ -875,7 +878,8 @@ static void vfs_parseList( /* RETURN: None               */
          switch(c) {
             case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
-               bounds[n] = bounds[n] * 10 + (int)(c - '0');
+               if (bounds[n] < (int)(MAX_BIT_IDX * BITS_PER_H_UINT))
+                  bounds[n] = bounds[n] * 10 + (int)(c - '0');
                break;
             case '-':
                n = 1;
